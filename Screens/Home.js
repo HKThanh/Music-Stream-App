@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView, Image, Text, TextInput, TouchableOpacity, Dimensions, FlatList } from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView, Image, Text, TextInput, TouchableOpacity, Dimensions, FlatList, KeyboardAvoidingView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
 const HomeScreen = () => {
     const [searchQuery, setSearchQuery] = useState('');
+    const [inputFocus, setInputFocus] = useState(false);
 
 const handleSearch = () => {
     // Implement search functionality
@@ -59,7 +60,7 @@ return (
                     <Image source={{ uri: "https://cdn.builder.io/api/v1/image/assets/TEMP/f39021c400f63792135f309f4a35376cd78481dd24df7bbe059d8bee33d3dc93?placeholderIfAbsent=true&apiKey=7f9f1700bcf0498e9f8119abfa6364fa" }} style={styles.greetingImage} resizeMode="contain" accessibilityLabel="Good Morning" />
                     <Image source={{ uri: "https://cdn.builder.io/api/v1/image/assets/TEMP/a4a4c8b530bbd3b9b2831de4804230d97022021d1d8d2586208891fda490749d?placeholderIfAbsent=true&apiKey=7f9f1700bcf0498e9f8119abfa6364fa" }} style={styles.nameImage} resizeMode="contain" accessibilityLabel="Ashley Scott" />
                 </View>
-                <View style={styles.searchContainer}>
+                <KeyboardAvoidingView style={styles.searchContainer}>
                     <TextInput
                         style={styles.searchInput}
                         placeholder="Search..."
@@ -67,11 +68,13 @@ return (
                         value={searchQuery}
                         onChangeText={setSearchQuery}
                         accessibilityLabel="Search input"
+                        onFocus={() => setInputFocus(true)}
+                        onBlur={() => setInputFocus(false)}
                     />
                     <TouchableOpacity style={styles.searchIconContainer} onPress={handleSearch} accessibilityLabel="Search">
                         <Ionicons name="search" size={24} color="#888" />
                     </TouchableOpacity>
-                </View>
+                </KeyboardAvoidingView>
                 <View style={styles.suggestionsSection}>
                     <Text style={styles.sectionTitle}>Suggestions for you</Text>
                     <FlatList
