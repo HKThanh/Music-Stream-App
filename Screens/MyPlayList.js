@@ -59,6 +59,9 @@ const MyPlayList = () => {
                     renderItem={playListItem}
                 />
             </View>
+            <Pressable style={{position: 'absolute', right: 10, bottom: 20}}>
+                <Image source={require('../assets/My_Playlists/Icon_Button_5.png')} />
+            </Pressable>
         </SafeAreaView>
     );
 }
