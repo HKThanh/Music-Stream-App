@@ -13,7 +13,7 @@ const playListItem = ({ item }) => (
             <Text style={styles.playListTitle}>{item.title}</Text>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Text style={styles.author}>{item.author}</Text>
-                <Entypo name="dot-single" size={32} color="black" />
+                <Entypo name="dot-single" size={36} color="#B3B6BD" />
                 <Text style={styles.numberOfSongs}>{item.numberOfSongs} Songs</Text>
             </View>
         </View>
@@ -45,17 +45,20 @@ const MyPlayList = () => {
         <SafeAreaView style={styles.container}>
             <View style={styles.headerContainer}>
                 <Pressable>
-                    <MaterialCommunityIcons name="chevron-left" size={30} color="black" />
+                    <MaterialCommunityIcons name="chevron-left" size={32} color="black" />
                 </Pressable>
                 <Text style={styles.title}>PlayLists</Text>
                 <Pressable>
-                    <MaterialCommunityIcons name="cast" size={30} color="black" />
+                    <MaterialCommunityIcons name="cast" size={32} color="black" />
                 </Pressable>
             </View>
-            <FlatList 
-                data={item}
-                renderItem={playListItem}
-            />
+            <View style={{padding: 10}}>
+                <Text style={styles.yourPlayList}>Your Playlists</Text>
+                <FlatList 
+                    data={item}
+                    renderItem={playListItem}
+                />
+            </View>
         </SafeAreaView>
     );
 }
@@ -80,6 +83,10 @@ const styles = StyleSheet.create({
     middleView: {
         padding: 10,
     },
+    yourPlayList: {
+        fontSize: 28,
+        fontWeight: '700',
+    },
     playListContainer: {
         width: width,
         flexDirection: 'row',
@@ -90,7 +97,6 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 10,
-        marginLeft: 10,
     },
     textContainer: {
         marginLeft: 10,
@@ -99,6 +105,16 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: '700',
     },
+    author: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: '#B3B6BD',
+    },
+    numberOfSongs: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: '#B3B6BD',
+    }
 });
 
 export default MyPlayList;
