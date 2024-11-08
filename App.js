@@ -1,10 +1,11 @@
-import HomeScreen from "./Screens/Home";
-import LaunchScreen_Premium from "./Screens/LaunchScreen_Premium";
-import MyPlayList from "./Screens/MyPlayList";
-import MyLibrary from "./Screens/MyLibrary";
+import HomeScreen from "./screens/Home";
+import LaunchScreen_Premium from "./screens/LaunchScreen_Premium";
+import MyPlayList from "./screens/MyPlayList";
+import MyLibrary from "./screens/MyLibrary";
+import PlayListDetail from "./screens/PlayListDetail";
 
 export default function App() {
   return (
-    <MyLibrary />
+    <PlayListDetail />
   );
 }
