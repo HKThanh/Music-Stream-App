@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
-const LaunchScreen_Premium = () => {
+const LaunchScreen_Premium = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <ImageBackground 
@@ -19,7 +19,12 @@ const LaunchScreen_Premium = () => {
                     <View style={{marginTop: 160}}>
                         <Text style={styles.title}>Wellcome to{'\n'}Premium</Text>
                         <Text style={styles.title}>...</Text>
-                        <Pressable style={styles.button}>
+                        <Pressable 
+                            style={styles.button}
+                            onPress={() => {
+                                navigation.navigate('HomeScreen');
+                            }}
+                        >
                             <Text style={styles.buttonText}>Start Listening</Text>
                         </Pressable>
                     </View>

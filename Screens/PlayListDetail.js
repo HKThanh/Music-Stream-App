@@ -50,7 +50,7 @@ const PlayMusicItem = ({ item }) => (
     </View>
 )
 
-const PlayListDetail = ({ route }) => {
+const PlayListDetail = ({ navigation, route }) => {
     const [isClicked, setIsClicked] = useState(false);
 
     const play = () => {
@@ -119,7 +119,9 @@ const PlayListDetail = ({ route }) => {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <MaterialIcons name="chevron-left" size={32} />
+                <MaterialIcons name="chevron-left" size={32}
+                    onPress={() => navigation.goBack()}
+                />
                 <MaterialIcons name="cast" size={32} />
             </View>
             <View style={styles.playlist}>

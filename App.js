@@ -19,10 +19,12 @@ const Tab = createBottomTabNavigator();
 
 const StackNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="HomeScreen">
+    <Stack.Navigator initialRouteName="LaunchScreen_Premium">
       <Stack.Screen name="HomeScreen" component={HomeScreen} options={{headerShown: false}} />
       <Stack.Screen name="MyPlayList" component={MyPlayList} options={{headerShown: false}} />
       <Stack.Screen name="PlayListDetail" component={PlayListDetail} options={{headerShown: false}} />
+      <Stack.Screen name="LaunchScreen_Premium" component={LaunchScreen_Premium} options={{headerShown: false}} />
+      <Stack.Screen name="ToSearch" component={Search} options={{headerShown: false}} />
     </Stack.Navigator>
   );
 }
@@ -32,7 +34,7 @@ const TabNavigator = () => {
     <Tab.Navigator screenOptions={{headerShown: false, tabBarStyle: {height: 50},}}>
       <Tab.Screen 
         name="Home" 
-        component={StackNavigator} 
+        component={HomeScreen} 
         options={{
           tabBarIcon:
             ({focused}) => (
@@ -68,7 +70,7 @@ const TabNavigator = () => {
 export default function App() {
   return (
     <NavigationContainer>
-      <TabNavigator />
+      <StackNavigator />
     </NavigationContainer>
   );
 }

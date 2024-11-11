@@ -16,100 +16,104 @@ import { Ionicons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
-const renderSuggestionItem = ({ item }) => (
-    <View style={styles.suggestionItem}>
-        <Image
-            source={{ uri: item.imageSource }}
-            style={styles.suggestionImage}
-            resizeMode="contain"
-            accessibilityLabel={item.label}
-        />
-    </View>
-);
+const renderSuggestionItem = ({ item }) => {
+    return (
+        <View style={styles.suggestionItem}>
+            <Image
+                source={item.imageSource}
+                style={styles.suggestionImage}
+                resizeMode="contain"
+            />
+        </View>
+    )
+};
 
-const renderChartItem = ({ item }) => (
-    <TouchableOpacity style={styles.chartItem} activeOpacity={0.7}>
-        <Image
-            resizeMode="contain"
-            source={{ uri: item.imageSource }}
-            style={styles.chartImage}
-            accessible={true}
-            accessibilityLabel="Chart topper image"
-        />
-        <Text style={styles.chartText}>Daily chart-touppers{"\n"}updates</Text>
-    </TouchableOpacity>
-);
-
-const renderAlbumItem = ({ item }) => (
-    <View style={styles.albumItem}>
-        <Image
-            source={{ uri: item.imageSource }}
-            style={styles.albumImage}
-            resizeMode="contain"
-            accessibilityLabel={`${item.title} by ${item.artist}`}
-        />
-        <Text style={styles.albumTitle}>{item.title}</Text>
-        <Text style={styles.albumArtist}>{item.artist}</Text>
-    </View>
-);
-
-const renderArtistItem = ({ item }) => (
-    <View style={styles.artistItem}>
-        <Image
-            source={{ uri: item.imageSource }}
-            style={styles.artistImage}
-            resizeMode="contain"
-            accessibilityLabel={item.name}
-        />
-        <Text style={styles.artistName}>{item.name}</Text>
-        <TouchableOpacity
-            style={styles.followButton}
-            accessibilityLabel={`Follow ${item.name}`}
+const ChartItem = ({ item, navigation }) => {
+    return (
+        <TouchableOpacity style={styles.chartItem} activeOpacity={0.7}
+            onPress={() => navigation.navigate("PlayListDetail")}
         >
-            <Text style={styles.followButtonText}>Follow</Text>
+            <Image
+                resizeMode="contain"
+                source={item.imageSource}
+                style={styles.chartImage}
+            />
+            <Text style={styles.chartText}>Daily chart-touppers{"\n"}updates</Text>
         </TouchableOpacity>
-    </View>
-);
+    );
+}
+
+const AlbumItem = ({ item, navigation }) => {
+    return (
+        <TouchableOpacity
+            style={styles.albumItem}
+            onPress={() => navigation.navigate("PlayListDetail")}
+        >
+            <Image
+                source={item.imageSource}
+                style={styles.albumImage}
+                resizeMode="contain"
+                accessibilityLabel={`${item.title} by ${item.artist}`}
+            />
+            <Text style={styles.albumTitle}>{item.title}</Text>
+            <Text style={styles.albumArtist}>{item.artist}</Text>
+        </TouchableOpacity>
+    );
+}
+
+const ArtistItem = ({ item }) => {
+    return (
+        <View style={styles.artistItem}>
+            <Image
+                source={item.imageSource}
+                style={styles.artistImage}
+                resizeMode="contain"
+                accessibilityLabel={item.name}
+            />
+            <Text style={styles.artistName}>{item.name}</Text>
+            <TouchableOpacity
+                style={styles.followButton}
+                accessibilityLabel={`Follow ${item.name}`}
+            >
+                <Text style={styles.followButtonText}>Follow</Text>
+            </TouchableOpacity>
+        </View>
+    );
+};
 
 const HomeScreen = ({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [inputFocus, setInputFocus] = useState(false);
 
-    const handleSearch = () => {
-        // Implement search functionality
+    const handleSearch = (navigation) => {
+        navigation.navigate("ToSearch");
     };
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <Image
-                    source={{
-                        uri: "https://cdn.builder.io/api/v1/image/assets/TEMP/c359ab28b15fa6e5b78382dfd484b95257eb1fe1af9901c4b947198dd762cec6?placeholderIfAbsent=true&apiKey=7f9f1700bcf0498e9f8119abfa6364fa",
-                    }}
-                    style={styles.headerImage}
+                    source={require("../assets/Home_Audio_Listing/Image_36.png")}
                     resizeMode="contain"
                     accessibilityLabel="Music App Header"
                 />
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Ionicons name="notifications-outline" size={30} color="#000" />
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate("MyPlayList")}
+                    >
+                        <Image
+                            source={require("../assets/Home_Audio_Listing/Avatar_3.png")}
+                            style={{ marginLeft: 16 }}
+                        />
+                    </TouchableOpacity>
+                </View>
             </View>
             <ScrollView>
                 <View style={styles.content}>
                     <View style={styles.greetingContainer}>
-                        <Image
-                            source={{
-                                uri: "https://cdn.builder.io/api/v1/image/assets/TEMP/f39021c400f63792135f309f4a35376cd78481dd24df7bbe059d8bee33d3dc93?placeholderIfAbsent=true&apiKey=7f9f1700bcf0498e9f8119abfa6364fa",
-                            }}
-                            style={styles.greetingImage}
-                            resizeMode="contain"
-                            accessibilityLabel="Good Morning"
-                        />
-                        <Image
-                            source={{
-                                uri: "https://cdn.builder.io/api/v1/image/assets/TEMP/a4a4c8b530bbd3b9b2831de4804230d97022021d1d8d2586208891fda490749d?placeholderIfAbsent=true&apiKey=7f9f1700bcf0498e9f8119abfa6364fa",
-                            }}
-                            style={styles.nameImage}
-                            resizeMode="contain"
-                            accessibilityLabel="Ashley Scott"
-                        />
+                        <Text style={styles.morningText}>Good morning,</Text>
+                        <Text style={styles.nameText}>Ashley Scott</Text>
                     </View>
                     <KeyboardAvoidingView style={styles.searchContainer}>
                         <TextInput
@@ -119,12 +123,11 @@ const HomeScreen = ({ navigation }) => {
                             value={searchQuery}
                             onChangeText={setSearchQuery}
                             accessibilityLabel="Search input"
-                            onFocus={() => setInputFocus(true)}
-                            onBlur={() => setInputFocus(false)}
+                            onPress={() => handleSearch(navigation)}
                         />
                         <TouchableOpacity
                             style={styles.searchIconContainer}
-                            onPress={handleSearch}
+                            onPress={() => handleSearch(navigation)}
                             accessibilityLabel="Search"
                         >
                             <Ionicons name="search" size={24} color="#888" />
@@ -137,20 +140,14 @@ const HomeScreen = ({ navigation }) => {
                             data={[
                                 {
                                     id: 1,
-                                    imageSource:
-                                        "https://cdn.builder.io/api/v1/image/assets/TEMP/788632f590a57c79eb2f05f904f72605dc632e8e7fd9fe379d1058bd60084e11?placeholderIfAbsent=true&apiKey=7f9f1700bcf0498e9f8119abfa6364fa",
-                                    text: "Suggestion 1",
-                                    label: "Suggestion 1",
+                                    imageSource: require("../assets/Home_Audio_Listing/Container_26.png"),
                                 },
                                 {
                                     id: 2,
-                                    imageSource:
-                                        "https://cdn.builder.io/api/v1/image/assets/TEMP/e8a052657fbfc59c214bae676e806eb58ce2f98e72d42033fd7d015f81ada475?placeholderIfAbsent=true&apiKey=7f9f1700bcf0498e9f8119abfa6364fa",
-                                    text: "Suggestion 2",
-                                    label: "Suggestion 2",
+                                    imageSource: require("../assets/Home_Audio_Listing/Container_27.png"),
                                 },
                             ]}
-                            renderItem={renderSuggestionItem}
+                            renderItem={(item) => renderSuggestionItem(item)}
                             keyExtractor={(item) => item.id.toString()}
                             showsHorizontalScrollIndicator={false}
                         />
@@ -176,21 +173,18 @@ const HomeScreen = ({ navigation }) => {
                             data={[
                                 {
                                     id: 1,
-                                    imageSource:
-                                        "https://cdn.builder.io/api/v1/image/assets/TEMP/591f27d2318d11d8e749216425222dba18973cb63324aecb9fccce364dd652b0?placeholderIfAbsent=true&apiKey=7f9f1700bcf0498e9f8119abfa6364fa",
+                                    imageSource: require("../assets/Home_Audio_Listing/Container_31.png"),
                                 },
                                 {
                                     id: 2,
-                                    imageSource:
-                                        "https://cdn.builder.io/api/v1/image/assets/TEMP/485e003db08b001a065dd6b419d949f1eac660cf2cd27e495758c3b01164157d?placeholderIfAbsent=true&apiKey=7f9f1700bcf0498e9f8119abfa6364fa",
+                                    imageSource: require("../assets/Home_Audio_Listing/Container_32.png"),
                                 },
                                 {
                                     id: 3,
-                                    imageSource:
-                                        "https://cdn.builder.io/api/v1/image/assets/TEMP/485e003db08b001a065dd6b419d949f1eac660cf2cd27e495758c3b01164157d?placeholderIfAbsent=true&apiKey=7f9f1700bcf0498e9f8119abfa6364fa",
+                                    imageSource: require("../assets/Home_Audio_Listing/Container_33.png"),
                                 },
                             ]}
-                            renderItem={renderChartItem}
+                            renderItem={({ item }) => <ChartItem item={item} navigation={navigation} />}
                             keyExtractor={(item) => item.id.toString()}
                             showsHorizontalScrollIndicator={false}
                         />
@@ -216,27 +210,24 @@ const HomeScreen = ({ navigation }) => {
                             data={[
                                 {
                                     id: 1,
-                                    imageSource:
-                                        "https://cdn.builder.io/api/v1/image/assets/TEMP/a56ea0874e84ff0acb7f987a8b37574f7337a28a9fe7a843f855c7aa129886df?placeholderIfAbsent=true&apiKey=7f9f1700bcf0498e9f8119abfa6364fa",
+                                    imageSource: require("../assets/Home_Audio_Listing/Image_45.png"),
                                     title: "ME",
                                     artist: "Jessica Gonzalez",
                                 },
                                 {
                                     id: 2,
-                                    imageSource:
-                                        "https://cdn.builder.io/api/v1/image/assets/TEMP/7787dc91edc8211900a8e4a717d34469e2e6a05603f32e64438aac094dc0b71b?placeholderIfAbsent=true&apiKey=7f9f1700bcf0498e9f8119abfa6364fa",
+                                    imageSource: require("../assets/Home_Audio_Listing/Image_46.png"),
                                     title: "Magna nost",
                                     artist: "Brian Thomas",
                                 },
                                 {
                                     id: 3,
-                                    imageSource:
-                                        "https://cdn.builder.io/api/v1/image/assets/TEMP/7787dc91edc8211900a8e4a717d34469e2e6a05603f32e64438aac094dc0b71b?placeholderIfAbsent=true&apiKey=7f9f1700bcf0498e9f8119abfa6364fa",
+                                    imageSource: require("../assets/Home_Audio_Listing/Image_47.png"),
                                     title: "Magna nost",
                                     artist: "Christopb",
                                 },
                             ]}
-                            renderItem={renderAlbumItem}
+                            renderItem={({ item }) => <AlbumItem item={item} navigation={navigation} />}
                             keyExtractor={(item) => item.id.toString()}
                             showsHorizontalScrollIndicator={false}
                         />
@@ -262,24 +253,21 @@ const HomeScreen = ({ navigation }) => {
                             data={[
                                 {
                                     id: 1,
-                                    imageSource:
-                                        "https://cdn.builder.io/api/v1/image/assets/TEMP/e8e823b46881639013b4c8eebee4db86c222791acd1d5f3ef42307a6112462c7?placeholderIfAbsent=true&apiKey=7f9f1700bcf0498e9f8119abfa6364fa",
+                                    imageSource: require("../assets/Home_Audio_Listing/Image_39.png"),
                                     name: "Jenifer Wilson",
                                 },
                                 {
                                     id: 2,
-                                    imageSource:
-                                        "https://cdn.builder.io/api/v1/image/assets/TEMP/533be8a3fe368cdad79a22f20c6b46aa5c63237fb30657030ff26aedc360efb9?placeholderIfAbsent=true&apiKey=7f9f1700bcf0498e9f8119abfa6364fa",
+                                    imageSource: require("../assets/Home_Audio_Listing/Image_40.png"),
                                     name: "Elizabeth Hall",
                                 },
                                 {
                                     id: 3,
-                                    imageSource:
-                                        "https://cdn.builder.io/api/v1/image/assets/TEMP/533be8a3fe368cdad79a22f20c6b46aa5c63237fb30657030ff26aedc360efb9?placeholderIfAbsent=true&apiKey=7f9f1700bcf0498e9f8119abfa6364fa",
+                                    imageSource: require("../assets/Home_Audio_Listing/Image_41.png"),
                                     name: "Anthony",
                                 },
                             ]}
-                            renderItem={renderArtistItem}
+                            renderItem={({ item }) => <ArtistItem item={item} />}
                             keyExtractor={(item) => item.id.toString()}
                             showsHorizontalScrollIndicator={false}
                         />
@@ -296,9 +284,11 @@ const styles = StyleSheet.create({
         backgroundColor: "#FFFFFF",
     },
     header: {
-        height: 50,
-        justifyContent: "center",
-        alignItems: "center",
+        height: 80,
+        justifyContent: "space-between",
+        alignItems: "flex-end",
+        flexDirection: 'row',
+        padding: 10,
     },
     headerImage: {
         width: "100%",
@@ -309,16 +299,17 @@ const styles = StyleSheet.create({
         padding: 16,
     },
     greetingContainer: {
-        marginBottom: 12,
+        marginBottom: 16,
     },
-    greetingImage: {
-        width: 113,
-        height: 26,
-        marginBottom: 8,
+    morningText: {
+        fontSize: 22,
+        fontWeight: "700",
+        color: "#000",
     },
-    nameImage: {
-        width: 156,
-        height: 36,
+    nameText: {
+        fontSize: 26,
+        fontWeight: "700",
+        color: "#000",
     },
     searchContainer: {
         flexDirection: "row",
