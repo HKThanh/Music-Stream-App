@@ -1,15 +1,18 @@
-import { SafeAreaView, View, Text, Image, FlatList, StyleSheet, Dimensions } from "react-native";
-import React from "react";
+import { SafeAreaView, View, Text, Image, FlatList, StyleSheet, Dimensions, TouchableOpacity } from "react-native";
+import React, {useState} from "react";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const { width } = Dimensions.get('window');
 
-const MusicItems = ({ item }) => (
-    <View style={{ padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+const MusicItems = ({ item, play }) => (
+    <TouchableOpacity style={{ padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+        onPress={() => play()}
+    >
         <View style={{flexDirection: 'row'}}>
             <Image source={item.image} style={{ width: 60, height: 60 }} />
             <View style={{marginLeft: 20}}>
@@ -24,10 +27,36 @@ const MusicItems = ({ item }) => (
             </View>
         </View>
         <Entypo name="dots-three-horizontal" size={32} color="black" />
+    </TouchableOpacity>
+)
+
+const PlayMusicItem = ({ item }) => (
+    <View style={{ padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#000', position: 'absolute', bottom: 0, width: width }}>
+        <View style={{flexDirection: 'row'}}>
+            <Image source={item.image} style={{ width: 60, height: 60 }} />
+            <View style={{marginLeft: 20}}>
+                <Text style={{ fontSize: 16, fontWeight: '700', color: '#fff' }}>{item.name}</Text>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Text style={{ fontSize: 14, color: '#fff' }}>{item.artist}</Text>
+                    <Entypo name="dot-single" size={24} color="#A8ACB4" />
+                    <Text style={{color: '#fff'}}>{item.duration}</Text>
+                </View>
+            </View>
+        </View>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between', width: width / 5}}>
+            <Ionicons name="heart-outline" size={28} color="white" />
+            <Ionicons name="play-outline" size={28} color="white" />
+        </View>
     </View>
 )
 
 const PlayListDetail = ({ route }) => {
+    const [isClicked, setIsClicked] = useState(false);
+
+    const play = () => {
+        setIsClicked(!isClicked);
+    }
+
     const music = [ 
         {
             id: 1,
@@ -88,7 +117,7 @@ const PlayListDetail = ({ route }) => {
     ]
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <MaterialIcons name="chevron-left" size={32} />
                 <MaterialIcons name="cast" size={32} />
@@ -112,7 +141,7 @@ const PlayListDetail = ({ route }) => {
                     <Text style={styles.normalText}>Daily chart-toppers update</Text>
                 </View>
             </View>
-            <View style={{flexDirection: 'row', marginTop: 10, alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 10}}>
+            <View style={{flex: 1,flexDirection: 'row', marginTop: 10, alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 10}}>
                 <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
                     <FontAwesome6 name="heart" size={24} color="black" />
                     <MaterialCommunityIcons name="dots-horizontal" size={32} color="black" />
@@ -122,13 +151,15 @@ const PlayListDetail = ({ route }) => {
                     <MaterialIcons name="play-circle" size={64} color="black" />
                 </View>
             </View>
-            <FlatList
-                data={music}
-                renderItem={MusicItems}
-                keyExtractor={item => item.id.toString()}
-                style={{height: width}}
-                showsVerticalScrollIndicator={false}
-            />
+            <View style={{flex: 5}}>
+                <FlatList
+                    data={music}
+                    renderItem={({ item }) => <MusicItems item={item} play={play} />}
+                    keyExtractor={item => item.id.toString()}
+                    showsVerticalScrollIndicator={false}
+                />
+            </View>
+            {isClicked ? <PlayMusicItem item={music[0]} /> : null}
         </SafeAreaView>
     );
 }
@@ -139,14 +170,15 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     header: {
+        flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 10,
-        marginTop: 20,
+        paddingHorizontal: 10,
         height: 80,
     },
     playlist: {
+        flex: 1,
         flexDirection: 'row',
         padding: 10,
         height: 140,

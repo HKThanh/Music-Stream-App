@@ -1,6 +1,6 @@
-import { SafeAreaView, View, Text, Image, Pressable, FlatList, StyleSheet, Dimensions } from "react-native";
+import { SafeAreaView, View, Text, Image, Pressable, FlatList, StyleSheet, Dimensions, TouchableOpacity } from "react-native";
 import React from "react";
-import Ionicons from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Entypo from '@expo/vector-icons/Entypo';
 
@@ -66,7 +66,7 @@ const AlbumItems = ({ item }) => (
     </View>
 )
 
-const MyLibrary = () => {
+const MyLibrary = ({navigation}) => {
     const filter = [
         {
             id: 1,
@@ -165,6 +165,7 @@ const MyLibrary = () => {
             image: require('../assets/My_Playlists/Image_111.png')
         },
     ]
+    
     return (
         <SafeAreaView>
             <View style={styles.headerContainer}>
@@ -199,7 +200,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
     },
     headerContainer: {
-        height: 100,
+        height: 80,
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 10,
@@ -259,7 +260,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '500',
         color: '#B3B6BD',
-    }
+    },
 });
 
 export default MyLibrary;

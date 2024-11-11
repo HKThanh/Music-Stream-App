@@ -6,7 +6,7 @@ const { width } = Dimensions.get('window');
 
 const LaunchScreen_Premium = () => {
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
             <ImageBackground 
                 source={require('../assets/Launch_Screen_Premium/Image_112.png')}
                 style={{flex: 1}}
@@ -25,7 +25,7 @@ const LaunchScreen_Premium = () => {
                     </View>
                 </ImageBackground>
             </ImageBackground>
-        </SafeAreaView>
+        </View>
     );
 };
 
