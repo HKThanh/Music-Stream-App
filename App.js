@@ -29,14 +29,14 @@ const StackNavigator = () => {
 
 const TabNavigator = () => {
   return (
-    <Tab.Navigator screenOptions={{headerShown: false}}>
+    <Tab.Navigator screenOptions={{headerShown: false, tabBarStyle: {height: 50},}}>
       <Tab.Screen 
         name="Home" 
         component={StackNavigator} 
         options={{
           tabBarIcon:
             ({focused}) => (
-              <MaterialCommunityIcons name="home" color={focused ? '#60D6E6' : 'black'} size={32} />
+              <MaterialCommunityIcons name="home" color={focused ? '#60D6E6' : 'black'} size={28} />
             ),
         }}
       />
@@ -46,7 +46,7 @@ const TabNavigator = () => {
         options={{
           tabBarIcon:
             ({focused}) => (
-              <Ionicons name="search" color={focused ? '#60D6E6' : 'black'} size={32} />
+              <Ionicons name="search" color={focused ? '#60D6E6' : 'black'} size={28} />
             ),
         }}
       />
@@ -57,7 +57,7 @@ const TabNavigator = () => {
           tabBarLabel: 'Library',
           tabBarIcon:
             ({focused}) => (
-              <Ionicons name="search" color={focused ? '#60D6E6' : 'black'} size={32} />
+              <Ionicons name="library" color={focused ? '#60D6E6' : 'black'} size={28} />
             ),
         }}
       />
