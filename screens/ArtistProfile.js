@@ -85,7 +85,7 @@ const ProfileHeader = () => {
                 <Image source={{ uri: item.image }} style={styles.trackImage} resizeMode="contain" />
                 <View style={styles.trackDetails}>
                     <Text style={styles.trackTitle}>{item.title}</Text>
-                    <Text style={styles.artistName}>{item.artist}</Text>
+                    <Text style={styles.artistTrackName}>{item.artist}</Text>
                     <View style={styles.trackStats}>
                         <Image source={require ('../assets/Artist_Profile/Player-Play--Streamline-Tabler.png')} style={styles.playIcon} resizeMode="contain" />
                         <Text style={styles.playCount}>{item.playCount}</Text>
@@ -261,18 +261,20 @@ const styles = StyleSheet.create({
       },
     profileHeader: {
         alignItems: 'center',
-        paddingBottom: 14,
+        paddingTop: 14,
       },
     profileImage: {
         width: 240,
         aspectRatio: 1,
+
       },
     artistName: {
         fontSize: 36,
         fontFamily: "Roboto",
-        fontWeight: "900",
+        fontWeight: "700",
         textAlign: "center",
-        color: "#000000",
+        color: "black",
+
       },
     followerCount: {
         fontSize: 16,
@@ -361,7 +363,7 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         color: "#000000",
       },
-      artistName: {
+      artistTrackName: {
         fontFamily: "Roboto",
         fontSize: 11,
         fontWeight: "500",
@@ -400,7 +402,7 @@ const styles = StyleSheet.create({
         aspectRatio: 1,
       },
       albumsTitle: {
-    fontFamily: "Inter, sans-serif",
+    fontFamily: "Roboto",
     fontSize: 20,
     fontWeight: "700",
     color: "#000000",
@@ -414,7 +416,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   sectionTitleAbout: {
-    fontFamily: "Inter, sans-serif",
+    fontFamily: "Roboto",
     fontSize: 20,
     fontWeight: "700",
     color: "#000000",
@@ -426,7 +428,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   shortDescription: {
-    fontFamily: "Inter, sans-serif",
+    fontFamily: "Roboto",
     fontSize: 12,
     fontWeight: "500",
     color: "#A0A5AF",
@@ -434,7 +436,7 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   fullDescription: {
-    fontFamily: "Inter, sans-serif",
+    fontFamily: "Roboto",
     fontSize: 12,
     fontWeight: "500",
     color: "#B3B6BD",
@@ -442,7 +444,7 @@ const styles = StyleSheet.create({
     marginRight: 26,
   },
   viewMore: {
-    fontFamily: "Inter, sans-serif",
+    fontFamily: "Roboto",
     fontSize: 13,
     fontWeight: "600",
     color: "#61C0CD",
