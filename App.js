@@ -2,6 +2,9 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { StyleSheet, Text, View } from 'react-native';
+import LaunchScreen from './screens/LaunchScreen';
+import FeedAudio from './screens/FeedAudio';
 
 import LaunchScreen_Premium from "./screens/LaunchScreen_Premium";
 import HomeScreen from "./screens/HomeScreen";
@@ -69,8 +72,22 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <StackNavigator />
-    </NavigationContainer>
+//     <NavigationContainer>
+//       <StackNavigator />
+//     </NavigationContainer>
+//   );
+// }
+
+    <View style={styles.container}>
+      {/* <LaunchScreen/> */}
+      <FeedAudio/>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+});
