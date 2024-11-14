@@ -36,7 +36,7 @@ const data = [
         img:'../assets/Feed_Audio_Listing/Image_94.png',
          },
   ];
-
+ 
   const renderFeed = ({item}) => {
     return (
         <View style={styles.feedContainer}>
@@ -63,8 +63,8 @@ const data = [
                 }} imageStyle={{borderRadius: 10}}>
                     <View style={{width:'100%',backgroundColor:'rgba(0,0,0,0.5)',borderRadius:10,padding:10,justifyContent:'center',alignItems:'start',height:'40%',position: 'absolute', bottom: 0,
                     }}>
-                        <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-                            <View>
+                        <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+                            <View style={{}}>
                                 <Text style={styles.title}>{item.title}</Text>
                                 <Text style={styles.author}>{item.author}</Text>
                             </View>
@@ -85,7 +85,8 @@ const data = [
                             <Image source={require('../assets/Comments/Favorite--Streamline-Carbon.png')} style={{width:20,height:20}}/>
                             <Text> {item.like}</Text>
                    </Pressable>
-                   <Pressable style={{flexDirection:'row',alignItems:'center'}}>
+                   <Pressable style={{flexDirection:'row',alignItems:'center'}}
+                   >
                             <Image source={require('../assets/Comments/Comment-2-Text-Line--Streamline-Majesticons.png')} style={{width:18,height:18}}/>
                             <Text> {item.comment}</Text>
                    </Pressable>
