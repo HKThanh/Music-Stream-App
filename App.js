@@ -86,15 +86,15 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
-    // <NavigationContainer>
-      // {/* <StackNavigator /> */}
-    // {/* </NavigationContainer> */}
-    <View style={styles.container}>
-      {/* <LaunchScreen/> */}
-      {/* <FeedAudio/> */}
-      {/* <SubscriptionPlans/> */}
-      <ArtistProfile/>
-    </View>
+    <NavigationContainer>
+      <StackNavigator />
+    </NavigationContainer>
+    // <View style={styles.container}>
+      // {/* <LaunchScreen/> */}
+      // {/* <FeedAudio/> */}
+      // {/* <SubscriptionPlans/> */}
+      // {/* <ArtistProfile/> */}
+    // {/* </View> */}
   );
 }
 
