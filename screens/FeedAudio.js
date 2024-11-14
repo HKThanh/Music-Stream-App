@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Pressable, ImageBackground, Image,FlatList} from "react-native";
+import { StyleSheet, Text, View, Pressable, ImageBackground, Image,FlatList, Touchable} from "react-native";
 import React from "react";
 // import React,{useEffect,useState} from 'react'
 
@@ -15,9 +15,9 @@ const data = [
     numberoflisteners: '1.2k',
     duration: '03:45',
     author: 'Jesica Gozalez',
-    like: '1.2k',
-    comment: '1.2k',
-    share: '1.2k',
+    like: '1000',
+    comment: '1200',
+    share: '3',
     bluetick: 'true',
     img:'../assets/Feed_Audio_Listing/Image_93.png',
      },
@@ -32,7 +32,7 @@ const data = [
         like: '1.2k',
         comment: '1.2k',
         share: '1.2k',
-        bluetick: 'true',
+        bluetick: 'false',
         img:'../assets/Feed_Audio_Listing/Image_94.png',
          },
   ];
@@ -46,7 +46,8 @@ const data = [
                     <View>
                         <View style={{flexDirection:'row'}} >
                         <Text style={styles.name}>{item.name}</Text>
-                        <Image source={require('../assets/Check-Circle--Streamline-Outlined----Material-Symbols.png')} style={{width:16,height:16,marginTop:5,marginLeft:2}}/>
+                        {item.bluetick==='true' && <Image source={require('../assets/Check-Circle--Streamline-Outlined----Material-Symbols.png')} style={{width:16,height:16,marginTop:5,marginLeft:2}}/>}
+                        {/* <Image source={require('../assets/Check-Circle--Streamline-Outlined----Material-Symbols.png')} style={{width:16,height:16,marginTop:5,marginLeft:2}}/> */}
                         </View>
                         <View style={{flexDirection:"row"}}>
                         <Text style={styles.date}>Posted a track </Text>
@@ -75,25 +76,31 @@ const data = [
                                 <Text style={styles.duration}>{item.duration}</Text>
                             </View>
                         </View>
-                    
-                  
-                   
                     </View>
                     </ImageBackground>
-              
-                {/* <Image source={require('../assets/Feed_Audio_Listing/Image_93.png')} style={styles.img} /> */}
             </View>
-            {/* <View style={styles.feedFooter}>
-                <View style={styles.feedFooterLeft}>
-                    <Image source={require('../assets/Feed_Audio_Listing/Avatar_4.png')} style={styles.icon} />
-                    <Text style={styles.number}>{item.like}</Text>
-                    <Image source={require('../assets/Feed_Audio_Listing/Avatar_4.png')} style={styles.icon} />
-                    <Text style={styles.number}>{item.comment}</Text>
-                    <Image source={require('../assets/Feed_Audio_Listing/Avatar_4.png')} style={styles.icon} />
-                    <Text style={styles.number}>{item.share}</Text>
+            <View style={{flexDirection:"row",justifyContent:'space-between',alignItems:'center',}} >
+                <View style={{flexDirection:'row',justifyContent:'space-around',padding:5,width:180}}>
+                   <Pressable style={{flexDirection:'row',alignItems:'center'}}>
+                            <Image source={require('../assets/Comments/Favorite--Streamline-Carbon.png')} style={{width:20,height:20}}/>
+                            <Text> {item.like}</Text>
+                   </Pressable>
+                   <Pressable style={{flexDirection:'row',alignItems:'center'}}>
+                            <Image source={require('../assets/Comments/Comment-2-Text-Line--Streamline-Majesticons.png')} style={{width:18,height:18}}/>
+                            <Text> {item.comment}</Text>
+                   </Pressable>
+                   <Pressable style={{flexDirection:'row',alignItems:'center'}}>
+                            <Image source={require('../assets/Comments/Refresh-Cw--Streamline-Lucide.png')} style={{width:16,height:16}}/>
+                            <Text> {item.share}</Text>
+                   </Pressable>
+                   
+                   
                 </View>
-                {item.bluetick ? <Image source={require('../assets/Feed_Audio_Listing/Avatar_4.png')} style={styles.icon} /> : null}
-            </View> */}
+                <Pressable style={{flexDirection:'row',alignItems:'center'}}>
+                            <Image source={require('../assets/Comments/Three-Dots--Streamline-Bootstrap.png')} style={{width:20,height:20}}/>
+                   </Pressable>
+            </View>
+
         </View>
     );
 }
