@@ -22,12 +22,13 @@ const Tab = createBottomTabNavigator();
 
 const StackNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="LaunchScreen_Premium">
-      <Stack.Screen name="HomeScreen" component={HomeScreen} options={{headerShown: false}} />
-      <Stack.Screen name="MyPlayList" component={MyPlayList} options={{headerShown: false}} />
-      <Stack.Screen name="PlayListDetail" component={PlayListDetail} options={{headerShown: false}} />
-      <Stack.Screen name="LaunchScreen_Premium" component={LaunchScreen_Premium} options={{headerShown: false}} />
-      <Stack.Screen name="ToSearch" component={Search} options={{headerShown: false}} />
+    <Stack.Navigator initialRouteName="LaunchScreen_Premium" screenOptions={{headerShown: false}}>
+      <Stack.Screen name="HomeScreen" component={TabNavigator} />
+      <Stack.Screen name="MyPlayList" component={MyPlayList} />
+      <Stack.Screen name="PlayListDetail" component={PlayListDetail} />
+      <Stack.Screen name="LaunchScreen_Premium" component={LaunchScreen_Premium} />
+      <Stack.Screen name="LaunchScreen" component={LaunchScreen} />
+      <Stack.Screen name="ToSearch" component={Search} />
     </Stack.Navigator>
   );
 }
@@ -55,6 +56,16 @@ const TabNavigator = () => {
             ),
         }}
       />
+      <Tab.Screen
+        name="Feed"
+        component={FeedAudio}
+        options={{
+          tabBarIcon:
+            ({focused}) => (
+              <MaterialCommunityIcons name="instagram" color={focused ? '#60D6E6' : 'black'} size={28} />
+            ),
+        }}
+      />
       <Tab.Screen 
         name="MyLibrary" 
         component={MyLibrary}
@@ -72,18 +83,18 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
-//     <NavigationContainer>
-//       <StackNavigator />
-//     </NavigationContainer>
-//   );
-// }
-
-    <View style={styles.container}>
-      {/* <LaunchScreen/> */}
-      <FeedAudio/>
-    </View>
+    <NavigationContainer>
+      <StackNavigator />
+    </NavigationContainer>
   );
 }
+
+    // <View style={styles.container}>
+    //   {/* <LaunchScreen/> */}
+    //   <FeedAudio/>
+    // </View>
+  // );
+// }
 
 const styles = StyleSheet.create({
   container: {
