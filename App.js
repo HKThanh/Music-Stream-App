@@ -5,7 +5,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StyleSheet, Text, View } from 'react-native';
 import LaunchScreen from './screens/LaunchScreen';
 import FeedAudio from './screens/FeedAudio';
-
+import SubscriptionPlans from './screens/SubscriptionPlans';
+import ArtistProfile from './screens/ArtistProfile';
 import LaunchScreen_Premium from "./screens/LaunchScreen_Premium";
 import HomeScreen from "./screens/HomeScreen";
 import MyPlayList from "./screens/MyPlayList";
@@ -29,6 +30,8 @@ const StackNavigator = () => {
       <Stack.Screen name="LaunchScreen_Premium" component={LaunchScreen_Premium} />
       <Stack.Screen name="LaunchScreen" component={LaunchScreen} />
       <Stack.Screen name="ToSearch" component={Search} />
+      <Stack.Screen name="SubscriptionPlans" component={SubscriptionPlans} />
+      <Stack.Screen name="ArtistProfile" component={ArtistProfile} />
     </Stack.Navigator>
   );
 }
@@ -83,18 +86,17 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <StackNavigator />
-    </NavigationContainer>
+    // <NavigationContainer>
+      // {/* <StackNavigator /> */}
+    // {/* </NavigationContainer> */}
+    <View style={styles.container}>
+      {/* <LaunchScreen/> */}
+      {/* <FeedAudio/> */}
+      {/* <SubscriptionPlans/> */}
+      <ArtistProfile/>
+    </View>
   );
 }
-
-    // <View style={styles.container}>
-    //   {/* <LaunchScreen/> */}
-    //   <FeedAudio/>
-    // </View>
-  // );
-// }
 
 const styles = StyleSheet.create({
   container: {
