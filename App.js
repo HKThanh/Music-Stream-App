@@ -30,6 +30,8 @@ const StackNavigator = () => {
       <Stack.Screen name="LaunchScreen_Premium" component={LaunchScreen_Premium} />
       <Stack.Screen name="LaunchScreen" component={LaunchScreen} />
       <Stack.Screen name="ToSearch" component={Search} />
+      <Stack.Screen name="SubscriptionPlans" component={SubscriptionPlans} />
+      <Stack.Screen name="ArtistProfile" component={ArtistProfile} />
     </Stack.Navigator>
   );
 }
@@ -84,15 +86,15 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
-//     <NavigationContainer>
-//       <StackNavigator />
-//     </NavigationContainer>
-    <View style={styles.container}>
-      {/* <LaunchScreen/> */}
-      {/* <FeedAudio/> */}
-      {/* <SubscriptionPlans/> */}
-      <ArtistProfile/>
-    </View>
+    <NavigationContainer>
+      <StackNavigator />
+    </NavigationContainer>
+    // <View style={styles.container}>
+      // {/* <LaunchScreen/> */}
+      // {/* <FeedAudio/> */}
+      // {/* <SubscriptionPlans/> */}
+      // {/* <ArtistProfile/> */}
+    // {/* </View> */}
   );
 }
 
