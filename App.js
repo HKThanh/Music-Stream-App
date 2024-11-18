@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -13,10 +13,10 @@ import MyPlayList from "./screens/MyPlayList";
 import MyLibrary from "./screens/MyLibrary";
 import PlayListDetail from "./screens/PlayListDetail";
 import Search from "./screens/Search";
+import MusicPlayer from "./screens/MusicPlayer";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Ionicons from "react-native-vector-icons/Ionicons";
-
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -32,6 +32,7 @@ const StackNavigator = () => {
       <Stack.Screen name="ToSearch" component={Search} />
       <Stack.Screen name="SubscriptionPlans" component={SubscriptionPlans} />
       <Stack.Screen name="ArtistProfile" component={ArtistProfile} />
+      <Stack.Screen name="MusicPlayer" component={MusicPlayer} />
     </Stack.Navigator>
   );
 }
@@ -85,16 +86,18 @@ const TabNavigator = () => {
 }
 
 export default function App() {
+
   return (
-    <NavigationContainer>
-      <StackNavigator />
-    </NavigationContainer>
+    // <NavigationContainer>
+    //   <StackNavigator />
+    // </NavigationContainer>
     // <View style={styles.container}>
       // {/* <LaunchScreen/> */}
       // {/* <FeedAudio/> */}
       // {/* <SubscriptionPlans/> */}
       // {/* <ArtistProfile/> */}
     // {/* </View> */}
+    <MusicPlayer />
   );
 }
 

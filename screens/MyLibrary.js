@@ -30,8 +30,10 @@ const ArtistItems = ({ item }) => (
     </View>
 )
 
-const MusicItems = ({ item }) => (
-    <View style={{ padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+const MusicItems = ({ item, navigation }) => (
+    <TouchableOpacity style={{ padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+        onPress={() => navigation.navigate('MusicPlayer', { item: item })}
+    >
         <View style={{flexDirection: 'row'}}>
             <Image source={item.image} style={{ width: 60, height: 60 }} />
             <View style={{marginLeft: 20}}>
@@ -46,7 +48,7 @@ const MusicItems = ({ item }) => (
             </View>
         </View>
         <Entypo name="heart" size={36} color="cyan" />
-    </View>
+    </TouchableOpacity>
 )
 
 const AlbumItems = ({ item }) => (
@@ -184,7 +186,7 @@ const MyLibrary = ({navigation}) => {
             />
             <FlatList
                 data={music}
-                renderItem={MusicItems}
+                renderItem={(item) => <MusicItems item={item.item} navigation={navigation} />}
             />
             <FlatList
                 data={album}
