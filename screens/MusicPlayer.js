@@ -13,20 +13,15 @@ const MusicPlayer = ({navigation, route }) => {
     const [position, setPosition] = useState(0);
     const soundRef = useRef(null);
 
-    item = {
-        url: "https://qwgduhsdzdrxiflrkovg.supabase.co/storage/v1/object/sign/ncs/Royalty.mp3?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJuY3MvUm95YWx0eS5tcDMiLCJpYXQiOjE3MzE1ODAwODYsImV4cCI6MTczNDE3MjA4Nn0.5qM5yo9A3r2IzuEpBfTFdWSn6qy8yWoD8spkRXmEVfw&t=2024-11-14T10%3A28%3A06.819Z",
-        name: 'Royalty',
-        artist: 'Egzod',
-        artwork: 'https://linkstorage.linkfire.com/medialinks/images/374fc4ba-fe39-4bcf-9cf0-74c87c879ed0/artwork-440x440.jpg'
-    }
+    const { item } = route.params;
 
     async function playSound() {
         try {
-            if (!item || !item.url) {
+            if (!item || !item.preview) {
                 throw new Error('Invalid item or URL');
             }
 
-            const { sound } = await Audio.Sound.createAsync({ uri: item.url });
+            const { sound } = await Audio.Sound.createAsync({ uri: item.preview });
                 setSound(sound);
                 soundRef.current = sound;
                 await sound.playAsync();
@@ -134,12 +129,12 @@ const MusicPlayer = ({navigation, route }) => {
                     />
                 </View>
 
-                <Image source={{uri: item.artwork}} style={{height: 400, width: 400}}></Image>
+                <Image source={{uri: item.artist.picture}} style={{height: 400, width: 400}}></Image>
 
                 {/* Song Info */}
                 <View style={styles.songInfoContainer}>
-                    <Text style={styles.songTitle}>{item.name}</Text>
-                    <Text style={styles.artistName}>{item.artist}</Text>
+                    <Text style={styles.songTitle}>{item.title}</Text>
+                    <Text style={styles.artistName}>{item.artist.name}</Text>
                 </View>
 
                 {/* Waveform and Time */}

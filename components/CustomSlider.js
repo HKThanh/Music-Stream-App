@@ -8,7 +8,7 @@ const CustomSlider = ( {duration, currentDuration, onSlidingComplete} ) => {
     return (
         <View style={styles.waveformContainer}>
             <Slider
-                style={{width: 200, height: 40}}
+                style={{width: 320, height: 40}}
                 value={currentDuration}
                 minimumValue={0}
                 maximumValue={duration}

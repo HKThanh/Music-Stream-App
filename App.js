@@ -18,6 +18,9 @@ import MusicPlayer from "./screens/MusicPlayer";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
+import store from "./redux-toolkit/configureStore";
+import { Provider } from "react-redux";
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -88,22 +91,12 @@ const TabNavigator = () => {
 export default function App() {
 
   return (
-    // <NavigationContainer>
-    //   <StackNavigator />
-    // </NavigationContainer>
-    // <View style={styles.container}>
-      // {/* <LaunchScreen/> */}
-      // {/* <FeedAudio/> */}
-      // {/* <SubscriptionPlans/> */}
-      // {/* <ArtistProfile/> */}
-    // {/* </View> */}
-    <MusicPlayer />
+    <Provider store={store}>
+    
+      <NavigationContainer>
+        <StackNavigator />
+      </NavigationContainer>
+
+    </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-});

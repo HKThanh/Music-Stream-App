@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     StyleSheet,
@@ -15,6 +15,16 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
+
+const api = 'https://api.deezer.com/chart/0/albums?limit=3&order=RATING_DESC';
+const api_chart = 'https://api.deezer.com/chart/0/playlists?limit=3&order=RATING_DESC';
+
+const shortTheText = (text, maxLength) => {
+    if (text.length <= maxLength) {
+        return text;
+    }
+    return text.substr(0, maxLength) + "...";
+}
 
 const renderSuggestionItem = ({ item }) => {
     return (
@@ -35,10 +45,10 @@ const ChartItem = ({ item, navigation }) => {
         >
             <Image
                 resizeMode="contain"
-                source={item.imageSource}
+                source={{ uri: item.picture}}
                 style={styles.chartImage}
             />
-            <Text style={styles.chartText}>Daily chart-touppers{"\n"}updates</Text>
+            <Text style={styles.chartText}>{shortTheText(item.title, 16)}</Text>
         </TouchableOpacity>
     );
 }
@@ -50,13 +60,13 @@ const AlbumItem = ({ item, navigation }) => {
             onPress={() => navigation.navigate("PlayListDetail")}
         >
             <Image
-                source={item.imageSource}
+                source={{uri : item.cover}}
                 style={styles.albumImage}
                 resizeMode="contain"
-                accessibilityLabel={`${item.title} by ${item.artist}`}
+                accessibilityLabel={`${item.title} by ${item.artist.name}`}
             />
             <Text style={styles.albumTitle}>{item.title}</Text>
-            <Text style={styles.albumArtist}>{item.artist}</Text>
+            <Text style={styles.albumArtist}>{item.artist.name}</Text>
         </TouchableOpacity>
     );
 }
@@ -83,7 +93,24 @@ const ArtistItem = ({ item }) => {
 
 const HomeScreen = ({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState("");
-    const [inputFocus, setInputFocus] = useState(false);
+    const [albums, setAlbums] = useState([]);
+    const [charts, setCharts] = useState([]);
+
+    useEffect(() => {
+        fetch(api)
+            .then((response) => response.json())
+            .then((data) => setAlbums(data.data))
+            .catch((error) => console.error(error));
+    }, []);
+
+    useEffect(() => {
+        fetch(api_chart)
+            .then((response) => response.json())
+            .then((data) => setCharts(data.data))
+            .catch((error) => console.error(error));
+    }, []);
+
+    console.log(charts[0].picture);
 
     const handleSearch = (navigation) => {
         navigation.navigate("ToSearch");
@@ -170,20 +197,21 @@ const HomeScreen = ({ navigation }) => {
                         </View>
                         <FlatList
                             horizontal
-                            data={[
-                                {
-                                    id: 1,
-                                    imageSource: require("../assets/Home_Audio_Listing/Container_31.png"),
-                                },
-                                {
-                                    id: 2,
-                                    imageSource: require("../assets/Home_Audio_Listing/Container_32.png"),
-                                },
-                                {
-                                    id: 3,
-                                    imageSource: require("../assets/Home_Audio_Listing/Container_33.png"),
-                                },
-                            ]}
+                            // data={[
+                            //     {
+                            //         id: 1,
+                            //         imageSource: require("../assets/Home_Audio_Listing/Container_31.png"),
+                            //     },
+                            //     {
+                            //         id: 2,
+                            //         imageSource: require("../assets/Home_Audio_Listing/Container_32.png"),
+                            //     },
+                            //     {
+                            //         id: 3,
+                            //         imageSource: require("../assets/Home_Audio_Listing/Container_33.png"),
+                            //     },
+                            // ]}
+                            data={charts}
                             renderItem={({ item }) => <ChartItem item={item} navigation={navigation} />}
                             keyExtractor={(item) => item.id.toString()}
                             showsHorizontalScrollIndicator={false}
@@ -207,27 +235,8 @@ const HomeScreen = ({ navigation }) => {
                         </View>
                         <FlatList
                             horizontal
-                            data={[
-                                {
-                                    id: 1,
-                                    imageSource: require("../assets/Home_Audio_Listing/Image_45.png"),
-                                    title: "ME",
-                                    artist: "Jessica Gonzalez",
-                                },
-                                {
-                                    id: 2,
-                                    imageSource: require("../assets/Home_Audio_Listing/Image_46.png"),
-                                    title: "Magna nost",
-                                    artist: "Brian Thomas",
-                                },
-                                {
-                                    id: 3,
-                                    imageSource: require("../assets/Home_Audio_Listing/Image_47.png"),
-                                    title: "Magna nost",
-                                    artist: "Christopb",
-                                },
-                            ]}
-                            renderItem={({ item }) => <AlbumItem item={item} navigation={navigation} />}
+                            data={albums}
+                            renderItem={ ({item})  => <AlbumItem item={item} navigation={navigation} />}
                             keyExtractor={(item) => item.id.toString()}
                             showsHorizontalScrollIndicator={false}
                         />
