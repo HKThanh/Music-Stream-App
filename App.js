@@ -4,7 +4,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StyleSheet, Text, View } from 'react-native';
 import LaunchScreen from './screens/LaunchScreen';
-import FeedAudio from './screens/FeedAudio';
+// import FeedAudio1 from './screens/FeedAudio';
+import FeedAudio from "./screens/FeedAudio2";
 import SubscriptionPlans from './screens/SubscriptionPlans';
 import ArtistProfile from './screens/ArtistProfile';
 import LaunchScreen_Premium from "./screens/LaunchScreen_Premium";
@@ -21,12 +22,14 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import store from "./redux-toolkit/configureStore";
 import { Provider } from "react-redux";
 
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const StackNavigator = () => {
   return (
     <Stack.Navigator initialRouteName="LaunchScreen_Premium" screenOptions={{headerShown: false}}>
+      {/*   <Stack.Navigator initialRouteName="FeedAudio" screenOptions={{headerShown: false}}> */}
       <Stack.Screen name="HomeScreen" component={TabNavigator} />
       <Stack.Screen name="MyPlayList" component={MyPlayList} />
       <Stack.Screen name="PlayListDetail" component={PlayListDetail} />
@@ -35,6 +38,7 @@ const StackNavigator = () => {
       <Stack.Screen name="ToSearch" component={Search} />
       <Stack.Screen name="SubscriptionPlans" component={SubscriptionPlans} />
       <Stack.Screen name="ArtistProfile" component={ArtistProfile} />
+      <Stack.Screen name="FeedAudio" component={FeedAudio} />
       <Stack.Screen name="MusicPlayer" component={MusicPlayer} />
     </Stack.Navigator>
   );
