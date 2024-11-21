@@ -46,6 +46,14 @@ class MusicManager {
 
             await sound.playAsync();
 
+            // replay the sound when it finishes
+            sound.setOnPlaybackStatusUpdate((status) => {
+                console.log('status: ', status);
+                if (status.didJustFinish) {
+                    sound.replayAsync();
+                }
+            });
+
             // Add a playback status listener
             this.sound.setOnPlaybackStatusUpdate((status) => {
                 if (status.isLoaded) {
@@ -72,6 +80,13 @@ class MusicManager {
                 await this.sound.playAsync();
                 this.isPlaying = true;
             }
+            // replay the sound when it finishes
+            this.sound.setOnPlaybackStatusUpdate((status) => {
+                console.log('status: ', status);
+                if (status.didJustFinish) {
+                    this.sound.replayAsync();
+                }
+            });
         } catch (error) {
             console.error('Error resuming sound:', error);
         }

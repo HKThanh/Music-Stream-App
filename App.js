@@ -4,7 +4,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StyleSheet, Text, View } from 'react-native';
 import LaunchScreen from './screens/LaunchScreen';
-import FeedAudio from './screens/FeedAudio';
+// import FeedAudio1 from './screens/FeedAudio';
+import FeedAudio from "./screens/FeedAudio2";
 import SubscriptionPlans from './screens/SubscriptionPlans';
 import ArtistProfile from './screens/ArtistProfile';
 import LaunchScreen_Premium from "./screens/LaunchScreen_Premium";
@@ -21,6 +22,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import store from "./redux-toolkit/configureStore";
 import { Provider } from "react-redux";
 
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -35,6 +37,7 @@ const StackNavigator = () => {
       <Stack.Screen name="ToSearch" component={Search} />
       <Stack.Screen name="SubscriptionPlans" component={SubscriptionPlans} />
       <Stack.Screen name="ArtistProfile" component={ArtistProfile} />
+      <Stack.Screen name="FeedAudio" component={FeedAudio} />
       <Stack.Screen name="MusicPlayer" component={MusicPlayer} />
     </Stack.Navigator>
   );
@@ -95,10 +98,6 @@ export default function App() {
     
       <NavigationContainer>
         <StackNavigator />
-        {/* <Stack.Navigator screenOptions={{headerShown: false}}>
-          <Stack.Screen name = "Search" component={Search} />
-          <Stack.Screen name = "MusicPlayer" component={MusicPlayer} />
-        </Stack.Navigator> */}
       </NavigationContainer>
 
     </Provider>

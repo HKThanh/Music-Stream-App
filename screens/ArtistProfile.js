@@ -287,6 +287,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
         color: "#858A8D",
         marginTop: 19,
+
       },
     actionButtons: {
         paddingHorizontal: 10,
