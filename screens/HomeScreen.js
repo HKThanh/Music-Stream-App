@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
     View,
     StyleSheet,
@@ -13,6 +14,9 @@ import {
     KeyboardAvoidingView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import PlayMusicItem from "../components/MinimizedPlayMusicItem";
+
+import playerSlice from "../redux-toolkit/playerSlice";
 
 const { width } = Dimensions.get("window");
 
@@ -96,21 +100,20 @@ const HomeScreen = ({ navigation }) => {
     const [albums, setAlbums] = useState([]);
     const [charts, setCharts] = useState([]);
 
+    const dispatch = useDispatch();
+    const player = useSelector((state) => state.player);
+
     useEffect(() => {
         fetch(api)
             .then((response) => response.json())
             .then((data) => setAlbums(data.data))
             .catch((error) => console.error(error));
-    }, []);
 
-    useEffect(() => {
         fetch(api_chart)
             .then((response) => response.json())
             .then((data) => setCharts(data.data))
             .catch((error) => console.error(error));
     }, []);
-
-    console.log(charts[0].picture);
 
     const handleSearch = (navigation) => {
         navigation.navigate("ToSearch");
@@ -197,20 +200,6 @@ const HomeScreen = ({ navigation }) => {
                         </View>
                         <FlatList
                             horizontal
-                            // data={[
-                            //     {
-                            //         id: 1,
-                            //         imageSource: require("../assets/Home_Audio_Listing/Container_31.png"),
-                            //     },
-                            //     {
-                            //         id: 2,
-                            //         imageSource: require("../assets/Home_Audio_Listing/Container_32.png"),
-                            //     },
-                            //     {
-                            //         id: 3,
-                            //         imageSource: require("../assets/Home_Audio_Listing/Container_33.png"),
-                            //     },
-                            // ]}
                             data={charts}
                             renderItem={({ item }) => <ChartItem item={item} navigation={navigation} />}
                             keyExtractor={(item) => item.id.toString()}
@@ -283,6 +272,8 @@ const HomeScreen = ({ navigation }) => {
                     </View>
                 </View>
             </ScrollView>
+            {player.currentSong && <PlayMusicItem item={player.currentSong} screen={"HomeScreen"} />}
+
         </SafeAreaView>
     );
 };

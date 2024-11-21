@@ -6,6 +6,11 @@ import avatar1 from '../assets/Feed_Audio_Listing/Avatar_4.png';
 import avatar2 from '../assets/Feed_Audio_Listing/Avatar_5.png';
 import image1 from '../assets/Feed_Audio_Listing/Image_93.png';
 import image2 from '../assets/Feed_Audio_Listing/Image_94.png';
+
+import { useDispatch, useSelector } from "react-redux";
+import playerSlice from "../redux-toolkit/playerSlice";
+import PlayMusicItem from "../components/MinimizedPlayMusicItem";
+
 const data = [
     { id: '1', 
     avatar: '../assets/Feed_Audio_Listing/Avatar_4.png',
@@ -107,10 +112,16 @@ const data = [
 }
 function FeedAudio() {
     // const [feed, setFeed] = useState([]);
+
+    const dispatch = useDispatch();
+
+    const player = useSelector((state) => state.player);
+
     return (
         <View style={styles.container}>
            <FlatList data={data}  renderItem={renderFeed} keyExtractor={item=>item.id}
            />
+           {player.currentSong && <PlayMusicItem item={player.currentSong} screen={'Feed'} />}
         </View>
     );
 }

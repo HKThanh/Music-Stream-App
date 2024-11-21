@@ -1,113 +1,70 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Text, View, Image, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Audio } from 'expo-av';
 import CustomSlider from '../components/CustomSlider';
-import Slider from '@react-native-community/slider';
+import {
+    setSound,
+    setCurrentSong,
+    setIsPlaying,
+    setCurrentDuration,
+    setDuration
+} from '../redux-toolkit/playerSlice';
+
+import MusicManager from '../utils/MusicManager';
 
 const MusicPlayer = ({navigation, route }) => {
-    const [sound, setSound] = useState();
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [duration, setDuration] = useState(0);
-    const [currentDuration, setCurrentDuration] = useState(0);
-    const [position, setPosition] = useState(0);
-    const soundRef = useRef(null);
+    const dispatch = useDispatch();
+    const player = useSelector((state) => state.player);
+    const musicManager = useRef(new MusicManager(dispatch));
 
     const { item } = route.params;
+    const { screen } = route.params;
 
-    async function playSound() {
+    // stop current sound if item is different
+    useEffect(() => {
+        if (musicManager.current.sound != null && player.currentSong.id !== item.id) {
+            musicManager.current.stopCurrentSound();
+            dispatch(setIsPlaying(false));
+        }
+    }, [item.preview]);
+
+    //Play Sound
+    const playSound = async () => {
         try {
-            if (!item || !item.preview) {
-                throw new Error('Invalid item or URL');
-            }
-
-            const { sound } = await Audio.Sound.createAsync({ uri: item.preview });
-                setSound(sound);
-                soundRef.current = sound;
-                await sound.playAsync();
-            
-            if (soundRef.current) {
-                await soundRef.current.setPositionAsync(position);
-                await soundRef.current.playAsync();
-            }
-
-            setIsPlaying(!isPlaying);
+            musicManager.current.playSound(item.preview);
+            dispatch(setSound(musicManager.current.sound));
+            dispatch(setCurrentSong(item));
         } catch (error) {
             console.error('Error playing sound:', error);
         }
-    }
+    };
 
-    // stop sound
-    async function stopSound() {
+    // Resume Sound
+    const resumeSound = async () => {
         try {
-            if (!sound) {
-                throw new Error('Invalid sound');
-            }
-            setIsPlaying(!isPlaying);
-            await sound.pauseAsync();
+            musicManager.current.resumeSound();
         } catch (error) {
-            console.error('Error stopping sound:', error);
-        }
-    }
-
-    // pause sound
-    async function pauseSound() {
-        try {
-            if (soundRef.current) {
-                const status = await soundRef.current.getStatusAsync();
-                setPosition(status.positionMillis);
-                await soundRef.current.pauseAsync();
-            }
-
-            setIsPlaying(false);
-        } catch (error) {
-            console.error('Error pausing sound:', error);
-        }
-    }
-
-    // get sound duration
-    useEffect(() => {
-        if (sound) {
-            sound.getStatusAsync().then((status) => {
-                if (status.isLoaded) {
-                    const durationInSeconds = Math.floor(status.durationMillis / 1000);
-                    setDuration(durationInSeconds);
-    
-                    const currentPositionInSeconds = Math.floor(status.positionMillis / 1000);
-                    setCurrentDuration(currentPositionInSeconds);
-                }
-            });
-    
-            // Update the slider in real-time during playback
-            sound.setOnPlaybackStatusUpdate((status) => {
-                if (status.isLoaded) {
-                    const currentPositionInSeconds = Math.floor(status.positionMillis / 1000);
-                    setCurrentDuration(currentPositionInSeconds);
-                }
-            });
-        }
-    }, [sound]);
-
-    // make a slider to change the current duration
-    const handleSliderValueChange = async (value) => {
-        if (soundRef.current) {
-            try {
-                await soundRef.current.setPositionAsync(value * 1000); // Convert seconds to milliseconds
-                setCurrentDuration(value); // Update UI
-            } catch (error) {
-                console.error('Error updating position:', error);
-            }
+            console.error('Error resuming sound:', error);
         }
     };
 
-    useEffect(() => {
-        return sound
-            ? () => {
-                sound.unloadAsync();
-                }
-            : undefined;
-    }, [sound]);
+    // Pause Sound 
+    const pauseSound = async () => {
+        try {
+            musicManager.current.pauseSound();
+        } catch (error) {
+            console.error('Error pausing sound:', error);
+        }
+    };
 
+    // Handle Slider Value Change
+    const handleSliderValueChange = async (value) => {
+        musicManager.current.handleSliderValueChange(value);
+    };
+
+    // Format Time Helper
     const formatTime = (time) => {
         const minutes = Math.floor(time / 60);
         const seconds = time % 60;
@@ -125,7 +82,7 @@ const MusicPlayer = ({navigation, route }) => {
                 <View style={styles.topBar}>
                     <Text style={styles.playText}>Play</Text>
                     <Icon name="chevron-down" size={24} color="white" 
-                        onPress={() => navigation.goBack()}
+                        onPress={() => navigation.navigate(screen)}
                     />
                 </View>
 
@@ -141,14 +98,14 @@ const MusicPlayer = ({navigation, route }) => {
                 <View style={styles.waveformContainer}>
                     {/* <Icon name="waveform" size={30} color="white" /> */}
                     < CustomSlider 
-                        currentDuration={currentDuration} 
-                        duration={duration} 
+                        currentDuration={player.currentDuration} 
+                        duration={player.duration} 
                         onSlidingComplete={handleSliderValueChange}
                     />
 
                     <View style={styles.timeContainer}>
-                        <Text style={styles.timeText}>{formatTime(currentDuration)}</Text>
-                        <Text style={styles.timeText}>{formatTime(duration)}</Text>
+                        <Text style={styles.timeText}>{formatTime(player.currentDuration)}</Text>
+                        <Text style={styles.timeText}>{formatTime(player.duration)}</Text>
                     </View>
                 </View>
 
@@ -160,11 +117,24 @@ const MusicPlayer = ({navigation, route }) => {
                     <TouchableOpacity>
                         <Icon name="skip-previous" size={30} color="white" />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.playButton}>
-                        {isPlaying ? (
-                            <Icon name="pause" size={30} color="black" onPress={pauseSound} />
+                    <TouchableOpacity style={styles.playButton}
+                    >
+                        {player.isPlaying ? (
+                            <Icon name="pause" size={30} color="black" 
+                                onPress={() => {
+                                    pauseSound();
+                                    dispatch(setIsPlaying(false));
+                                }} />
                         ) : (
-                            <Icon name="play" size={30} color="black" onPress={playSound} />
+                            <Icon name="play" size={30} color="black" 
+                                onPress={() => {
+                                    if (musicManager.current.sound != null) {
+                                        resumeSound();
+                                    } else {
+                                        playSound();
+                                    }
+                                    dispatch(setIsPlaying(true));
+                                }} />
                         )    
                         }
                     </TouchableOpacity>

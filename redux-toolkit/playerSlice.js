@@ -1,21 +1,23 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    data: {},
     isPlaying: false,
-    position: 0,
     duration: 0,
     currentDuration: 0,
     isRandom: false,
     isRepeat: false,
     playlist: [],
-    currentSong: {},
+    currentSong: null,
+    sound: null,
 };
 
 const playerSlice = createSlice({
     name: 'player',
     initialState,
     reducers: {
+        setSound: (state, action) => {
+            state.sound = action.payload;
+        },
         setPlaylist: (state, action) => {
             state.playlist = action.payload;
         },
@@ -24,9 +26,6 @@ const playerSlice = createSlice({
         },
         setIsPlaying: (state, action) => {
             state.isPlaying = action.payload;
-        },
-        setPosition: (state, action) => {
-            state.position = action.payload;
         },
         setDuration: (state, action) => {
             state.duration = action.payload;
@@ -43,6 +42,15 @@ const playerSlice = createSlice({
     }
 });
 
-export const { setPlaylist, setCurrentSong, setIsPlaying, setPosition, setDuration, setCurrentDuration, setIsRandom, setIsRepeat } = playerSlice.actions;
+export const { 
+    setPlaylist, 
+    setCurrentSong, 
+    setIsPlaying, 
+    setSound,
+    setDuration, 
+    setCurrentDuration, 
+    setIsRandom, 
+    setIsRepeat 
+} = playerSlice.actions;
 
 export default playerSlice.reducer;

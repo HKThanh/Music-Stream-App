@@ -95,6 +95,10 @@ export default function App() {
     
       <NavigationContainer>
         <StackNavigator />
+        {/* <Stack.Navigator screenOptions={{headerShown: false}}>
+          <Stack.Screen name = "Search" component={Search} />
+          <Stack.Screen name = "MusicPlayer" component={MusicPlayer} />
+        </Stack.Navigator> */}
       </NavigationContainer>
 
     </Provider>

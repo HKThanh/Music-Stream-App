@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Image, FlatList } from 'react-native';
+import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Image, FlatList, TouchableOpacity } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Entypo from '@expo/vector-icons/Entypo';
-import { TouchableOpacity } from 'react-native';
+import MinimizedPlayMusicItem from '../components/MinimizedPlayMusicItem';
+import { useDispatch, useSelector } from 'react-redux';
+
+import {
+    setCurrentSong,
+    setCurrentDuration,
+    setDuration,
+    setIsPlaying,
+    setSound,
+} from '../redux-toolkit/playerSlice';
 
 const api = 'https://api.deezer.com/search?q=';
 
@@ -28,8 +37,10 @@ const SearchItem = ({ item, navigation }) => {
     return (
         <TouchableOpacity 
             style={styles.searchItemContainer}
-            onPress={() => navigation.navigate('MusicPlayer', { item })}
-            // onPress={() => console.log(item)}
+            onPress={() => {
+                    navigation.navigate('MusicPlayer', { item, screen: 'Search' });
+                }
+            }
         >
             <View style={{flexDirection: 'row'}}>
                 <Image
@@ -54,6 +65,12 @@ const Search = ({ navigation }) => {
     const [searchText, setSearchText] = useState('');
     const [isFocused, setIsFocused] = useState(false);
     const [data, setData] = useState([]);
+
+    const { isPlaying, duration, currentDuration, position, currentSong, sound } = useSelector(
+        (state) => state.player
+    );
+
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (searchText) {
@@ -109,6 +126,7 @@ const Search = ({ navigation }) => {
                     </View>
                 </View>
             </TouchableWithoutFeedback>
+            { currentSong && <MinimizedPlayMusicItem item={currentSong} screen={'Search'} />}
         </KeyboardAvoidingView>
     );
 };

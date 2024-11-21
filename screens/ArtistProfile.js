@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, Image, Text, ScrollView,TouchableOpacity, FlatList } from 'react-native';
-
-
+import { useDispatch, useSelector } from 'react-redux';
+import playerSlice from '../redux-toolkit/playerSlice';
+import PlayMusicItem from '../components/MinimizedPlayMusicItem';
 
 const ProfileHeader = () => {
     return (
@@ -239,6 +240,9 @@ const ProfileHeader = () => {
     );
   };
 const ArtistProfile = () => {
+    const dispatch = useDispatch();
+    const player = useSelector((state) => state.player);
+
     return (
       <ScrollView style={styles.container}>
         <ProfileHeader/>
@@ -248,7 +252,7 @@ const ArtistProfile = () => {
         <AboutSection />
         <FansAlsoLike />
         <View style={{height: 80}} />
-
+        {player.currentSong && <PlayMusicItem item={player.currentSong} screen={'ArtistProfile'} />}
         </ScrollView>
   );
 };
