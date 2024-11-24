@@ -15,6 +15,10 @@ import {
     Pressable
 } from "react-native";
 
+import playerSlice from "../redux-toolkit/playerSlice";
+import { useDispatch, useSelector } from "react-redux";
+import PlayMusicItem from "../components/MinimizedPlayMusicItem";
+
 
 const date = new Date();
 const { height } = Dimensions.get("window");
@@ -82,6 +86,8 @@ const App = () => {
     const [newComment, setNewComment] = useState(""); // Nội dung bình luận mới
     const slideAnim = useRef(new Animated.Value(height)).current; // Giá trị bắt đầu (dưới màn hình)
     const [expandedComments, setExpandedComments] = useState({});
+    const dispatch = useDispatch();
+    const player = useSelector((state) => state.player);
 
 
     const data12 = [

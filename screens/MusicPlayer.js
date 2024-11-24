@@ -1,118 +1,148 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Text, View, Image, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Audio } from 'expo-av';
 import CustomSlider from '../components/CustomSlider';
-import Slider from '@react-native-community/slider';
+import {
+    setSound,
+    setCurrentSong,
+    setIsPlaying,
+    setCurrentDuration,
+    setDuration
+} from '../redux-toolkit/playerSlice';
+
+import MusicManager from '../utils/MusicManager';
 
 const MusicPlayer = ({navigation, route }) => {
-    const [sound, setSound] = useState();
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [duration, setDuration] = useState(0);
-    const [currentDuration, setCurrentDuration] = useState(0);
-    const [position, setPosition] = useState(0);
-    const soundRef = useRef(null);
+    const dispatch = useDispatch();
+    const player = useSelector((state) => state.player);
+    const musicManager = useRef(MusicManager.getInstance(dispatch)); // Singleton instance of MusicManager
 
-    const { item } = route.params;
+    const { item, screen } = route.params;
 
-    async function playSound() {
+    // stop current sound if item is different
+    useEffect(() => {
+        // Stop current sound if a new song is selected
+        if (musicManager.current.sound && player.currentSong.id !== item.id) {
+            musicManager.current.stopCurrentSound();
+            dispatch(setIsPlaying(false));
+        }
+
+        // Set the playlist and current song
+        if (player.album) {
+            musicManager.current.setPlaylist(player.album, item);
+        }
+
+        // Play the selected song
+        playSound();
+
+        return () => {
+            musicManager.current.stopCurrentSound();
+        };
+    }, [item]);
+
+    //Play Sound
+    const playSound = async () => {
         try {
-            if (!item || !item.preview) {
-                throw new Error('Invalid item or URL');
-            }
+            await musicManager.current.playSound(item.preview);
+            // dispatch(setSound(musicManager.current.sound));
+            dispatch(setCurrentSong(item));
+            dispatch(setIsPlaying(true));
 
-            const { sound } = await Audio.Sound.createAsync({ uri: item.preview });
-                setSound(sound);
-                soundRef.current = sound;
-                await sound.playAsync();
-            
-            if (soundRef.current) {
-                await soundRef.current.setPositionAsync(position);
-                await soundRef.current.playAsync();
-            }
-
-            setIsPlaying(!isPlaying);
+            console.log('Playing sound:', player.currentSong ? player.currentSong.title : item.title );
         } catch (error) {
             console.error('Error playing sound:', error);
         }
-    }
+    };
 
-    // stop sound
-    async function stopSound() {
+    // Resume Sound
+    const resumeSound = async () => {
         try {
-            if (!sound) {
-                throw new Error('Invalid sound');
-            }
-            setIsPlaying(!isPlaying);
-            await sound.pauseAsync();
+            await musicManager.current.resumeSound();
+            dispatch(setIsPlaying(true));
         } catch (error) {
-            console.error('Error stopping sound:', error);
-        }
-    }
-
-    // pause sound
-    async function pauseSound() {
-        try {
-            if (soundRef.current) {
-                const status = await soundRef.current.getStatusAsync();
-                setPosition(status.positionMillis);
-                await soundRef.current.pauseAsync();
-            }
-
-            setIsPlaying(false);
-        } catch (error) {
-            console.error('Error pausing sound:', error);
-        }
-    }
-
-    // get sound duration
-    useEffect(() => {
-        if (sound) {
-            sound.getStatusAsync().then((status) => {
-                if (status.isLoaded) {
-                    const durationInSeconds = Math.floor(status.durationMillis / 1000);
-                    setDuration(durationInSeconds);
-    
-                    const currentPositionInSeconds = Math.floor(status.positionMillis / 1000);
-                    setCurrentDuration(currentPositionInSeconds);
-                }
-            });
-    
-            // Update the slider in real-time during playback
-            sound.setOnPlaybackStatusUpdate((status) => {
-                if (status.isLoaded) {
-                    const currentPositionInSeconds = Math.floor(status.positionMillis / 1000);
-                    setCurrentDuration(currentPositionInSeconds);
-                }
-            });
-        }
-    }, [sound]);
-
-    // make a slider to change the current duration
-    const handleSliderValueChange = async (value) => {
-        if (soundRef.current) {
-            try {
-                await soundRef.current.setPositionAsync(value * 1000); // Convert seconds to milliseconds
-                setCurrentDuration(value); // Update UI
-            } catch (error) {
-                console.error('Error updating position:', error);
-            }
+            console.error('Error resuming sound:', error);
         }
     };
 
-    useEffect(() => {
-        return sound
-            ? () => {
-                sound.unloadAsync();
-                }
-            : undefined;
-    }, [sound]);
+    // Pause Sound 
+    const pauseSound = async () => {
+        try {
+            await musicManager.current.pauseSound();
+            dispatch(setIsPlaying(false));
+        } catch (error) {
+            console.error('Error pausing sound:', error);
+        }
+    };
 
+    // Handle Slider Value Change
+    const handleSliderValueChange = async (value) => {
+        try {
+            await musicManager.current.handleSliderValueChange(value);
+        } catch (error) {
+            console.error('Error updating slider position:', error);
+        }
+    };
+
+    // Format Time Helper
     const formatTime = (time) => {
         const minutes = Math.floor(time / 60);
         const seconds = time % 60;
         return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     };
+
+    //return previous screen
+    const goBack = (screen, album_id) => {
+        if (screen === 'PlayListDetail') {
+            navigation.navigate(screen, { id: album_id });
+        } else {
+            navigation.navigate(screen);
+        }
+    }
+
+    // Handle Next Track
+    const handleNextTrack = async () => {
+        try {
+            const nextUri = musicManager.current.getNextTrackUri();
+            if (nextUri) {
+                const nextSong = player.album.find((song) => song.preview === nextUri);
+                musicManager.current.setPlaylist(player.album, nextSong);
+                await musicManager.current.playSound(nextUri);
+                dispatch(setCurrentSong(nextSong));
+                dispatch(setIsPlaying(true));
+            }
+        } catch (error) {
+            console.error('Error playing next track:', error);
+        }
+    };
+
+    // Handle Previous Track
+    const handlePreviousTrack = async () => {
+        try {
+            const previousUri = musicManager.current.getPreviousTrackUri();
+            if (previousUri) {
+                const previousSong = player.album.find((song) => song.preview === previousUri);
+                musicManager.current.setPlaylist(player.album, previousSong);
+                await musicManager.current.playSound(previousUri);
+                dispatch(setCurrentSong(previousSong));
+                dispatch(setIsPlaying(true));
+            }
+        } catch (error) {
+            console.error('Error playing previous track:', error);
+        }
+    };
+
+    // handle end of playlist
+    const handleEndOfPlaylist = () => {
+        // Stop current sound
+        musicManager.current.stopCurrentSound();
+        dispatch(setIsPlaying(false));
+        // Reset the playlist
+        musicManager.current.setPlaylist(player.album, player.album[0]);
+        // Play the first song
+        playSound();
+    }
 
     return (
         <View style={styles.container}>
@@ -125,30 +155,30 @@ const MusicPlayer = ({navigation, route }) => {
                 <View style={styles.topBar}>
                     <Text style={styles.playText}>Play</Text>
                     <Icon name="chevron-down" size={24} color="white" 
-                        onPress={() => navigation.goBack()}
+                        onPress={() => goBack(screen, player.currentSong.album.id)}
                     />
                 </View>
 
-                <Image source={{uri: item.artist.picture}} style={{height: 400, width: 400}}></Image>
+                <Image source={{uri: player.currentSong ? player.currentSong.album.cover : item.artist.picture}} style={{height: 400, width: 400}}></Image>
 
                 {/* Song Info */}
                 <View style={styles.songInfoContainer}>
-                    <Text style={styles.songTitle}>{item.title}</Text>
-                    <Text style={styles.artistName}>{item.artist.name}</Text>
+                    <Text style={styles.songTitle}>{player.currentSong ? player.currentSong.title : item.title}</Text>
+                    <Text style={styles.artistName}>{player.currentSong ? player.currentSong.artist.name : item.artist.name}</Text>
                 </View>
 
                 {/* Waveform and Time */}
                 <View style={styles.waveformContainer}>
                     {/* <Icon name="waveform" size={30} color="white" /> */}
                     < CustomSlider 
-                        currentDuration={currentDuration} 
-                        duration={duration} 
+                        currentDuration={player.currentDuration} 
+                        duration={player.duration} 
                         onSlidingComplete={handleSliderValueChange}
                     />
 
                     <View style={styles.timeContainer}>
-                        <Text style={styles.timeText}>{formatTime(currentDuration)}</Text>
-                        <Text style={styles.timeText}>{formatTime(duration)}</Text>
+                        <Text style={styles.timeText}>{formatTime(player.currentDuration)}</Text>
+                        <Text style={styles.timeText}>{formatTime(player.duration)}</Text>
                     </View>
                 </View>
 
@@ -158,18 +188,35 @@ const MusicPlayer = ({navigation, route }) => {
                         <Icon name="shuffle" size={30} color="white" />
                     </TouchableOpacity>
                     <TouchableOpacity>
-                        <Icon name="skip-previous" size={30} color="white" />
+                        <Icon name="skip-previous" size={30} color="white" 
+                            onPress={handlePreviousTrack}    
+                        />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.playButton}>
-                        {isPlaying ? (
-                            <Icon name="pause" size={30} color="black" onPress={pauseSound} />
+                    <TouchableOpacity style={styles.playButton}
+                    >
+                        {player.isPlaying ? (
+                            <Icon name="pause" size={30} color="black" 
+                                onPress={() => {
+                                    pauseSound();
+                                    dispatch(setIsPlaying(false));
+                                }} />
                         ) : (
-                            <Icon name="play" size={30} color="black" onPress={playSound} />
+                            <Icon name="play" size={30} color="black" 
+                                onPress={() => {
+                                    if (musicManager.current.sound != null) {
+                                        resumeSound();
+                                    } else {
+                                        playSound();
+                                    }
+                                    dispatch(setIsPlaying(true));
+                                }} />
                         )    
                         }
                     </TouchableOpacity>
                     <TouchableOpacity>
-                        <Icon name="skip-next" size={30} color="white" />
+                        <Icon name="skip-next" size={30} color="white" 
+                            onPress={handleNextTrack}
+                        />
                     </TouchableOpacity>
                     <TouchableOpacity>
                         <Icon name="repeat" size={30} color="white" />

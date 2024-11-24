@@ -107,10 +107,16 @@ const data12 = [
 }
 function FeedAudio() {
     // const [feed, setFeed] = useState([]);
+
+    const dispatch = useDispatch();
+
+    const player = useSelector((state) => state.player);
+
     return (
         <View style={styles1.container}>
            <FlatList data={data12}  renderItem={renderFeed} keyExtractor={item=>item.id}
            />
+           {player.currentSong && <PlayMusicItem item={player.currentSong} screen={'Feed'} />}
         </View>
     );
 }

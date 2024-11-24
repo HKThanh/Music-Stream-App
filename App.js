@@ -29,7 +29,6 @@ const Tab = createBottomTabNavigator();
 const StackNavigator = () => {
   return (
     <Stack.Navigator initialRouteName="LaunchScreen_Premium" screenOptions={{headerShown: false}}>
-      {/*   <Stack.Navigator initialRouteName="FeedAudio" screenOptions={{headerShown: false}}> */}
       <Stack.Screen name="HomeScreen" component={TabNavigator} />
       <Stack.Screen name="MyPlayList" component={MyPlayList} />
       <Stack.Screen name="PlayListDetail" component={PlayListDetail} />
