@@ -4,6 +4,10 @@ import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Entypo from '@expo/vector-icons/Entypo';
 
+import { useDispatch, useSelector } from "react-redux";
+import playerSlice from "../redux-toolkit/playerSlice";
+import PlayMusicItem from "../components/MinimizedPlayMusicItem";
+
 const { width } = Dimensions.get('window');
 
 const filterItem = ({ item }) => (
@@ -69,6 +73,9 @@ const AlbumItems = ({ item }) => (
 )
 
 const MyLibrary = ({navigation}) => {
+    const dispatch = useDispatch();
+    const player = useSelector((state) => state.player);
+
     const filter = [
         {
             id: 1,
@@ -192,6 +199,7 @@ const MyLibrary = ({navigation}) => {
                 data={album}
                 renderItem={AlbumItems}
             />
+            {player.currentSong && <PlayMusicItem item={player.currentSong} screen={'MyLibrary'} />}
         </SafeAreaView>
     );
 }
