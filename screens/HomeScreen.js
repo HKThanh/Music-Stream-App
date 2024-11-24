@@ -61,7 +61,7 @@ const AlbumItem = ({ item, navigation }) => {
     return (
         <TouchableOpacity
             style={styles.albumItem}
-            onPress={() => navigation.navigate("PlayListDetail")}
+            onPress={() => navigation.navigate("PlayListDetail", { id: item.id })}
         >
             <Image
                 source={{uri : item.cover}}

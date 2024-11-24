@@ -7,6 +7,8 @@ const initialState = {
     isRandom: false,
     isRepeat: false,
     playlist: [],
+    album: [],
+    artist: [],
     currentSong: null,
     sound: null,
 };
@@ -20,6 +22,12 @@ const playerSlice = createSlice({
         },
         setPlaylist: (state, action) => {
             state.playlist = action.payload;
+        },
+        setAlbum: (state, action) => {
+            state.album = action.payload;
+        },
+        setArtist: (state, action) => {
+            state.artist = action.payload;
         },
         setCurrentSong: (state, action) => {
             state.currentSong = action.payload;
@@ -42,15 +50,17 @@ const playerSlice = createSlice({
     }
 });
 
-export const { 
-    setPlaylist, 
-    setCurrentSong, 
-    setIsPlaying, 
+export const {
+    setPlaylist,
+    setAlbum,
+    setArtist,
+    setCurrentSong,
+    setIsPlaying,
     setSound,
-    setDuration, 
-    setCurrentDuration, 
-    setIsRandom, 
-    setIsRepeat 
+    setDuration,
+    setCurrentDuration,
+    setIsRandom,
+    setIsRepeat
 } = playerSlice.actions;
 
 export default playerSlice.reducer;

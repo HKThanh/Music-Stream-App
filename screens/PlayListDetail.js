@@ -1,28 +1,38 @@
 import { SafeAreaView, View, Text, Image, FlatList, StyleSheet, Dimensions, TouchableOpacity } from "react-native";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useDispatch, useSelector } from "react-redux";
+import {setAlbum, setCurrentSong} from "../redux-toolkit/playerSlice";
+import PlayMusicItem from "../components/MinimizedPlayMusicItem";
+import MusicManager from "../utils/MusicManager";
 
 const { width } = Dimensions.get('window');
 
-const MusicItems = ({ item, play }) => (
+const formatDuration = (duration) => {
+    const minutes = Math.floor(duration / 60);
+    const seconds = duration % 60;
+    return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+}   
+
+const MusicItems = ({ item, navigation }) => (
     <TouchableOpacity style={{ padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
-        onPress={() => play()}
+        onPress={() => navigation.navigate('MusicPlayer', { item, screen: 'PlayListDetail' })}
     >
         <View style={{flexDirection: 'row'}}>
-            <Image source={item.image} style={{ width: 60, height: 60 }} />
+            <Image source={{uri: item.album.cover}} style={{ width: 60, height: 60 }} />
             <View style={{marginLeft: 20}}>
-                <Text style={{ fontSize: 16, fontWeight: '700' }}>{item.name}</Text>
-                <Text style={{ fontSize: 14, color: '#000' }}>{item.artist}</Text>
+                <Text style={{ fontSize: 16, fontWeight: '700' }}>{item.title}</Text>
+                <Text style={{ fontSize: 14, color: '#000' }}>{item.artist.name}</Text>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     <Entypo name="triangle-right" size={16} color="#A8ACB4" />
-                    <Text style={{color: '#A8ACB4'}}>{item.view}M </Text>
+                    <Text style={{color: '#A8ACB4'}}>{item.rank} </Text>
                     <Entypo name="dot-single" size={24} color="#A8ACB4" />
-                    <Text style={{color: '#A8ACB4'}}>{item.duration}</Text>
+                    <Text style={{color: '#A8ACB4'}}>{formatDuration(item.duration)}</Text>
                 </View>
             </View>
         </View>
@@ -30,91 +40,22 @@ const MusicItems = ({ item, play }) => (
     </TouchableOpacity>
 )
 
-const PlayMusicItem = ({ item }) => (
-    <View style={{ padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#000', position: 'absolute', bottom: 0, width: width }}>
-        <View style={{flexDirection: 'row'}}>
-            <Image source={item.image} style={{ width: 60, height: 60 }} />
-            <View style={{marginLeft: 20}}>
-                <Text style={{ fontSize: 16, fontWeight: '700', color: '#fff' }}>{item.name}</Text>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text style={{ fontSize: 14, color: '#fff' }}>{item.artist}</Text>
-                    <Entypo name="dot-single" size={24} color="#A8ACB4" />
-                    <Text style={{color: '#fff'}}>{item.duration}</Text>
-                </View>
-            </View>
-        </View>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between', width: width / 5}}>
-            <Ionicons name="heart-outline" size={28} color="white" />
-            <Ionicons name="play-outline" size={28} color="white" />
-        </View>
-    </View>
-)
-
 const PlayListDetail = ({ navigation, route }) => {
-    const [isClicked, setIsClicked] = useState(false);
+    const { id } = route.params;
 
-    const play = () => {
-        setIsClicked(!isClicked);
-    }
+    const api = 'https://api.deezer.com/album/' + id;
+    const player = useSelector(state => state.player);
 
-    const music = [ 
-        {
-            id: 1,
-            name: 'Tum Hi Ho',
-            artist: 'Arijit Singh',
-            image: require('../assets/My_Library/Image_101.png'),
-            view: 2.1,
-            duration: 3.36,
-        },
-        {
-            id: 2,
-            name: 'Tera Hone Laga Hoon',
-            artist: 'Atif Aslam',
-            image: require('../assets/My_Library/Image_102.png'),
-            view: 2.1,
-            duration: 3.36,
-        },
-        {
-            id: 3,
-            name: 'Mile Ho Tum',
-            artist: 'Neha Kakkar',
-            image: require('../assets/My_Library/Image_104.png'),
-            view: 2.1,
-            duration: 3.36,
-        },
-        {
-            id: 4,
-            name: 'Sun Raha Hai',
-            artist: 'Shreya Ghoshal',
-            image: require('../assets/My_Library/Image_105.png'),
-            view: 2.1,
-            duration: 3.36,
-        },
-        {
-            id: 5,
-            name: 'Sun Raha Hai',
-            artist: 'Shreya Ghoshal',
-            image: require('../assets/My_Library/Image_105.png'),
-            view: 2.1,
-            duration: 3.36,
-        },
-        {
-            id: 6,
-            name: 'Sun Raha Hai',
-            artist: 'Shreya Ghoshal',
-            image: require('../assets/My_Library/Image_105.png'),
-            view: 2.1,
-            duration: 3.36,
-        },
-        {
-            id: 7,
-            name: 'Sun Raha Hai',
-            artist: 'Shreya Ghoshal',
-            image: require('../assets/My_Library/Image_105.png'),
-            view: 2.1,
-            duration: 3.36,
-        },
-    ]
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        fetch(api)
+            .then(response => response.json())
+            .then(data => dispatch(setAlbum(data.tracks.data)))
+            .catch(error => console.error('Error fetching data:', error));
+    }, []);
+
+    
 
     return (
         <SafeAreaView style={styles.container}>
@@ -155,13 +96,13 @@ const PlayListDetail = ({ navigation, route }) => {
             </View>
             <View style={{flex: 5}}>
                 <FlatList
-                    data={music}
-                    renderItem={({ item }) => <MusicItems item={item} play={play} />}
+                    data={player.album}
+                    renderItem={({ item }) => <MusicItems item={item} navigation={navigation} />}
                     keyExtractor={item => item.id.toString()}
                     showsVerticalScrollIndicator={false}
                 />
             </View>
-            {isClicked ? <PlayMusicItem item={music[0]} /> : null}
+            {player.currentSong && <PlayMusicItem item={player.currentSong} screen={"PlayListDetail"} />}
         </SafeAreaView>
     );
 }

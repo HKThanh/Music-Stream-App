@@ -17,25 +17,40 @@ import MusicManager from '../utils/MusicManager';
 const MusicPlayer = ({navigation, route }) => {
     const dispatch = useDispatch();
     const player = useSelector((state) => state.player);
-    const musicManager = useRef(new MusicManager(dispatch));
+    const musicManager = useRef(MusicManager.getInstance(dispatch)); // Singleton instance of MusicManager
 
-    const { item } = route.params;
-    const { screen } = route.params;
+    const { item, screen } = route.params;
 
     // stop current sound if item is different
     useEffect(() => {
-        if (musicManager.current.sound != null && player.currentSong.id !== item.id) {
+        // Stop current sound if a new song is selected
+        if (musicManager.current.sound && player.currentSong.id !== item.id) {
             musicManager.current.stopCurrentSound();
             dispatch(setIsPlaying(false));
         }
-    }, [item.preview]);
+
+        // Set the playlist and current song
+        if (player.album) {
+            musicManager.current.setPlaylist(player.album, item);
+        }
+
+        // Play the selected song
+        playSound();
+
+        return () => {
+            musicManager.current.stopCurrentSound();
+        };
+    }, [item]);
 
     //Play Sound
     const playSound = async () => {
         try {
-            musicManager.current.playSound(item.preview);
-            dispatch(setSound(musicManager.current.sound));
+            await musicManager.current.playSound(item.preview);
+            // dispatch(setSound(musicManager.current.sound));
             dispatch(setCurrentSong(item));
+            dispatch(setIsPlaying(true));
+
+            console.log('Playing sound:', player.currentSong ? player.currentSong.title : item.title );
         } catch (error) {
             console.error('Error playing sound:', error);
         }
@@ -44,7 +59,8 @@ const MusicPlayer = ({navigation, route }) => {
     // Resume Sound
     const resumeSound = async () => {
         try {
-            musicManager.current.resumeSound();
+            await musicManager.current.resumeSound();
+            dispatch(setIsPlaying(true));
         } catch (error) {
             console.error('Error resuming sound:', error);
         }
@@ -53,7 +69,8 @@ const MusicPlayer = ({navigation, route }) => {
     // Pause Sound 
     const pauseSound = async () => {
         try {
-            musicManager.current.pauseSound();
+            await musicManager.current.pauseSound();
+            dispatch(setIsPlaying(false));
         } catch (error) {
             console.error('Error pausing sound:', error);
         }
@@ -61,7 +78,11 @@ const MusicPlayer = ({navigation, route }) => {
 
     // Handle Slider Value Change
     const handleSliderValueChange = async (value) => {
-        musicManager.current.handleSliderValueChange(value);
+        try {
+            await musicManager.current.handleSliderValueChange(value);
+        } catch (error) {
+            console.error('Error updating slider position:', error);
+        }
     };
 
     // Format Time Helper
@@ -70,6 +91,58 @@ const MusicPlayer = ({navigation, route }) => {
         const seconds = time % 60;
         return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     };
+
+    //return previous screen
+    const goBack = (screen, album_id) => {
+        if (screen === 'PlayListDetail') {
+            navigation.navigate(screen, { id: album_id });
+        } else {
+            navigation.navigate(screen);
+        }
+    }
+
+    // Handle Next Track
+    const handleNextTrack = async () => {
+        try {
+            const nextUri = musicManager.current.getNextTrackUri();
+            if (nextUri) {
+                const nextSong = player.album.find((song) => song.preview === nextUri);
+                musicManager.current.setPlaylist(player.album, nextSong);
+                await musicManager.current.playSound(nextUri);
+                dispatch(setCurrentSong(nextSong));
+                dispatch(setIsPlaying(true));
+            }
+        } catch (error) {
+            console.error('Error playing next track:', error);
+        }
+    };
+
+    // Handle Previous Track
+    const handlePreviousTrack = async () => {
+        try {
+            const previousUri = musicManager.current.getPreviousTrackUri();
+            if (previousUri) {
+                const previousSong = player.album.find((song) => song.preview === previousUri);
+                musicManager.current.setPlaylist(player.album, previousSong);
+                await musicManager.current.playSound(previousUri);
+                dispatch(setCurrentSong(previousSong));
+                dispatch(setIsPlaying(true));
+            }
+        } catch (error) {
+            console.error('Error playing previous track:', error);
+        }
+    };
+
+    // handle end of playlist
+    const handleEndOfPlaylist = () => {
+        // Stop current sound
+        musicManager.current.stopCurrentSound();
+        dispatch(setIsPlaying(false));
+        // Reset the playlist
+        musicManager.current.setPlaylist(player.album, player.album[0]);
+        // Play the first song
+        playSound();
+    }
 
     return (
         <View style={styles.container}>
@@ -82,16 +155,16 @@ const MusicPlayer = ({navigation, route }) => {
                 <View style={styles.topBar}>
                     <Text style={styles.playText}>Play</Text>
                     <Icon name="chevron-down" size={24} color="white" 
-                        onPress={() => navigation.navigate(screen)}
+                        onPress={() => goBack(screen, player.currentSong.album.id)}
                     />
                 </View>
 
-                <Image source={{uri: item.artist.picture}} style={{height: 400, width: 400}}></Image>
+                <Image source={{uri: player.currentSong ? player.currentSong.album.cover : item.artist.picture}} style={{height: 400, width: 400}}></Image>
 
                 {/* Song Info */}
                 <View style={styles.songInfoContainer}>
-                    <Text style={styles.songTitle}>{item.title}</Text>
-                    <Text style={styles.artistName}>{item.artist.name}</Text>
+                    <Text style={styles.songTitle}>{player.currentSong ? player.currentSong.title : item.title}</Text>
+                    <Text style={styles.artistName}>{player.currentSong ? player.currentSong.artist.name : item.artist.name}</Text>
                 </View>
 
                 {/* Waveform and Time */}
@@ -115,7 +188,9 @@ const MusicPlayer = ({navigation, route }) => {
                         <Icon name="shuffle" size={30} color="white" />
                     </TouchableOpacity>
                     <TouchableOpacity>
-                        <Icon name="skip-previous" size={30} color="white" />
+                        <Icon name="skip-previous" size={30} color="white" 
+                            onPress={handlePreviousTrack}    
+                        />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.playButton}
                     >
@@ -139,7 +214,9 @@ const MusicPlayer = ({navigation, route }) => {
                         }
                     </TouchableOpacity>
                     <TouchableOpacity>
-                        <Icon name="skip-next" size={30} color="white" />
+                        <Icon name="skip-next" size={30} color="white" 
+                            onPress={handleNextTrack}
+                        />
                     </TouchableOpacity>
                     <TouchableOpacity>
                         <Icon name="repeat" size={30} color="white" />
