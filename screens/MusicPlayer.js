@@ -9,7 +9,9 @@ import {
     setCurrentSong,
     setIsPlaying,
     setCurrentDuration,
-    setDuration
+    setDuration,
+    setIsRandom,
+    setIsRepeat,
 } from '../redux-toolkit/playerSlice';
 
 import MusicManager from '../utils/MusicManager';
@@ -36,21 +38,14 @@ const MusicPlayer = ({navigation, route }) => {
 
         // Play the selected song
         playSound();
-
-        return () => {
-            musicManager.current.stopCurrentSound();
-        };
     }, [item]);
 
     //Play Sound
     const playSound = async () => {
         try {
             await musicManager.current.playSound(item.preview);
-            // dispatch(setSound(musicManager.current.sound));
             dispatch(setCurrentSong(item));
             dispatch(setIsPlaying(true));
-
-            console.log('Playing sound:', player.currentSong ? player.currentSong.title : item.title );
         } catch (error) {
             console.error('Error playing sound:', error);
         }
@@ -133,6 +128,17 @@ const MusicPlayer = ({navigation, route }) => {
         }
     };
 
+    const playRandomSong = (dispatch) => {
+        dispatch(setIsRandom(!player.isRandom));
+        musicManager.current.isRandom = !player.isRandom;
+    }
+
+    const repeatSong = (dispatch) => {
+        // Repeat the current song
+        dispatch(setIsRepeat(!player.isRepeat));
+        musicManager.current.isRepeat = !player.isRepeat;
+    }
+
     // handle end of playlist
     const handleEndOfPlaylist = () => {
         // Stop current sound
@@ -185,7 +191,9 @@ const MusicPlayer = ({navigation, route }) => {
                 {/* Playback Controls */}
                 <View style={styles.controlsContainer}>
                     <TouchableOpacity>
-                        <Icon name="shuffle" size={30} color="white" />
+                        <Icon name="shuffle" size={30} color={player.isRandom ? "cyan" : "white"} 
+                            onPress={() => playRandomSong(dispatch)}
+                        />
                     </TouchableOpacity>
                     <TouchableOpacity>
                         <Icon name="skip-previous" size={30} color="white" 
@@ -219,7 +227,9 @@ const MusicPlayer = ({navigation, route }) => {
                         />
                     </TouchableOpacity>
                     <TouchableOpacity>
-                        <Icon name="repeat" size={30} color="white" />
+                        <Icon name="repeat" size={30} color={player.isRepeat ? "cyan" : "white"} 
+                            onPress={() => repeatSong(dispatch)}
+                        />
                     </TouchableOpacity>
                 </View>
 

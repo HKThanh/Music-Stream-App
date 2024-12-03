@@ -44,6 +44,13 @@ const PlayMusicItem = ({ item, screen }) => {
         musicManager.handleSliderValueChange(value);
     };
 
+    const shortTheText = (text) => {
+        if (text.length > 14) {
+            return text.substring(0, 14) + '...';
+        }
+        return text
+    }
+
     return (
         <View 
             style={{ padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#021526', position: 'absolute', bottom: 0, width: width }}
@@ -67,9 +74,9 @@ const PlayMusicItem = ({ item, screen }) => {
                     )}
                     <View style={{ marginLeft: 20 }}
                     >
-                        <Text style={{ fontSize: 16, fontWeight: '700', color: '#fff' }}>{item.title_short}</Text>
+                        <Text style={{ fontSize: 16, fontWeight: '700', color: '#fff' }}>{shortTheText(item.title_short)}</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Text style={{ fontSize: 14, color: '#fff' }}>{item.artist.name}</Text>
+                            <Text style={{ fontSize: 14, color: '#fff' }}>{shortTheText(item.artist.name)}</Text>
                             <Entypo name="dot-single" size={24} color="#A8ACB4" />
                             <Text style={{ color: '#fff' }}>{formatDuration(item.duration)}</Text>
                         </View>
