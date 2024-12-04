@@ -7,7 +7,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useDispatch, useSelector } from "react-redux";
-import {setAlbum, setCurrentSong} from "../redux-toolkit/playerSlice";
+import {setAlbum, setCurrentSong, setIsPlaying, setIsRandom} from "../redux-toolkit/playerSlice";
 import PlayMusicItem from "../components/MinimizedPlayMusicItem";
 import MusicManager from "../utils/MusicManager";
 
@@ -41,21 +41,62 @@ const MusicItems = ({ item, navigation }) => (
 )
 
 const PlayListDetail = ({ navigation, route }) => {
-    const { id } = route.params;
+    const { id, type } = route.params;
+    let api = 'https://api.deezer.com/';
 
-    const api = 'https://api.deezer.com/album/' + id;
+    switch (type) {
+        case 'playlist':
+            api += 'playlist/' + id;
+            break;
+        case 'album':
+            api += 'album/' + id;
+            break;
+        case 'artist':
+            api += 'artist/' + id;
+            break;
+        case 'chart':
+            api += 'playlist/' + id;
+            break;
+        default:
+            break;
+    }
+
+    // const api = 'https://api.deezer.com/album/' + id;
     const player = useSelector(state => state.player);
+
+    const musicManager = new MusicManager();
+
+    const [albums, setAlbums] = useState({});
 
     const dispatch = useDispatch();
 
     useEffect(() => {
         fetch(api)
             .then(response => response.json())
-            .then(data => dispatch(setAlbum(data.tracks.data)))
+            .then(data => { 
+                dispatch(setAlbum(data.tracks.data));
+                setAlbums(data);
+            })
+            .then(() => {
+                if (player.album.length > 0) {
+                    musicManager.current.playlist = player.album;
+                }
+            })
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
-    
+    const playRandomSong = (dispatch) => {
+        dispatch(setIsRandom(!player.isRandom));
+        musicManager.isRandom = !player.isRandom;
+    }
+
+    const playFirstSong = (dispatch, album) => {
+        dispatch(setCurrentSong(album[0]));
+        dispatch(setIsPlaying(true));
+        musicManager.playSound(album[0].preview);
+        musicManager.currentSong = album[0];
+        musicManager.playlist = album;
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -67,19 +108,15 @@ const PlayListDetail = ({ navigation, route }) => {
             </View>
             <View style={styles.playlist}>
                 <View style={{alignItems: 'center', justifyContent: 'center'}}>
-                    <Image source={require('../assets/Playlist_Details_Audio_Listing/Image_50.png')} />
-                    <View style={{position: 'absolute'}}>
-                        <Text style={styles.playlistImageName}>Top 50</Text>
-                        <Text style={styles.playlistImageName}>Canada</Text>
-                    </View>
+                    <Image source={{uri: albums.cover}} style={{width: 120, height: 120, borderRadius: 14}} />
                 </View>
                 <View style={{marginLeft: 10, justifyContent: 'space-between', height: '100%'}}>
-                    <Text style={styles.playlistName}>Top 50 - Canada</Text>
+                    <Text style={styles.playlistName}>{albums.title}</Text>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                         <FontAwesome6 name="heart" size={16} color="cyan" />
-                        <Text style={[styles.normalText, {marginLeft: 10}]}>1,234</Text>
+                        <Text style={[styles.normalText, {marginLeft: 10}]}>{albums.fans}</Text>
                         <Entypo name="dot-single" size={32} color="black" />
-                        <Text style={styles.normalText}>05:10:18</Text>
+                        <Text style={styles.normalText}>{formatDuration(albums.duration)}</Text>
                     </View>
                     <Text style={styles.normalText}>Daily chart-toppers update</Text>
                 </View>
@@ -90,8 +127,12 @@ const PlayListDetail = ({ navigation, route }) => {
                     <MaterialCommunityIcons name="dots-horizontal" size={32} color="black" />
                 </View>
                 <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
-                    <FontAwesome5 name="random" size={24} color="black" />
-                    <MaterialIcons name="play-circle" size={64} color="black" />
+                    <FontAwesome5 name="random" size={24} color={player.isRandom ? "cyan" : "black"} 
+                        onPress={() => playRandomSong(dispatch)}
+                    />
+                    <MaterialIcons name="play-circle" size={64} color="black" 
+                        onPress={() => playFirstSong(dispatch, player.album)}
+                    />
                 </View>
             </View>
             <View style={{flex: 5}}>

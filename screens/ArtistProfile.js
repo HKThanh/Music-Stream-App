@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Image, Text, ScrollView,TouchableOpacity, FlatList } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import playerSlice from '../redux-toolkit/playerSlice';
+import playerSlice, { setAlbum, setArtist } from '../redux-toolkit/playerSlice';
 import PlayMusicItem from '../components/MinimizedPlayMusicItem';
+import MusicManager from '../utils/MusicManager';
 
-const ProfileHeader = () => {
+const ProfileHeader = ({item}) => {
     return (
       <View style={styles.profileHeader}>
         <Image
-          source={{ uri: "https://cdn.builder.io/api/v1/image/assets/TEMP/122e3b852695630d71c19913205bc5015c4996f921c924d361c45fb493ed4edd?placeholderIfAbsent=true&apiKey=a7d7da211ad44a5aab803d9d255fbf27" }}
+          source={{ uri: item.picture }}
           style={styles.profileImage}
           resizeMode="contain"
         />
-        <Text style={styles.artistName}>Ryan Young</Text>
-        <Text style={styles.followerCount}>65.1K Followers</Text>
+        <Text style={styles.artistName}>{item.name}</Text>
+        <Text style={styles.followerCount}>{item.nb_fan} Followers - {item.nb_album} Albums</Text>
       </View>
     );
   };
@@ -53,43 +54,47 @@ const ProfileHeader = () => {
     );
   };
   
-  const PopularTrack = () => {
-    const track = [
-        {
-            id: '1',
-            title: 'Me',
-            artist: 'Ryan Young',
-            playCount: '68M',
-            duration: '03:36',
-            image: 'https://cdn.builder.io/api/v1/image/assets/TEMP/fee5d29de9b1d8bdca1df866a730d4bb89dc3b242016c0d9030659ee4891df15?placeholderIfAbsent=true&apiKey=a7d7da211ad44a5aab803d9d255fbf27',
-        },
-        {
-            id: '2',
-            title: 'Me',
-            artist: 'Ryan Young',
-            playCount: '68M',
-            duration: '03:36',
-            image: 'https://cdn.builder.io/api/v1/image/assets/TEMP/fee5d29de9b1d8bdca1df866a730d4bb89dc3b242016c0d9030659ee4891df15?placeholderIfAbsent=true&apiKey=a7d7da211ad44a5aab803d9d255fbf27',
-        },
-        {
-            id: '3',
-            title: 'Me',
-            artist: 'Ryan Young',
-            playCount: '68M',
-            duration: '03:36',
-            image: 'https://cdn.builder.io/api/v1/image/assets/TEMP/fee5d29de9b1d8bdca1df866a730d4bb89dc3b242016c0d9030659ee4891df15?placeholderIfAbsent=true&apiKey=a7d7da211ad44a5aab803d9d255fbf27',
-        },
-    ];
-    const renderTrack = ({ item }) => {
+  const PopularTrack = ( {track, navigation} ) => {
+    // const track = [
+    //     {
+    //         id: '1',
+    //         title: 'Me',
+    //         artist: 'Ryan Young',
+    //         playCount: '68M',
+    //         duration: '03:36',
+    //         image: 'https://cdn.builder.io/api/v1/image/assets/TEMP/fee5d29de9b1d8bdca1df866a730d4bb89dc3b242016c0d9030659ee4891df15?placeholderIfAbsent=true&apiKey=a7d7da211ad44a5aab803d9d255fbf27',
+    //     },
+    //     {
+    //         id: '2',
+    //         title: 'Me',
+    //         artist: 'Ryan Young',
+    //         playCount: '68M',
+    //         duration: '03:36',
+    //         image: 'https://cdn.builder.io/api/v1/image/assets/TEMP/fee5d29de9b1d8bdca1df866a730d4bb89dc3b242016c0d9030659ee4891df15?placeholderIfAbsent=true&apiKey=a7d7da211ad44a5aab803d9d255fbf27',
+    //     },
+    //     {
+    //         id: '3',
+    //         title: 'Me',
+    //         artist: 'Ryan Young',
+    //         playCount: '68M',
+    //         duration: '03:36',
+    //         image: 'https://cdn.builder.io/api/v1/image/assets/TEMP/fee5d29de9b1d8bdca1df866a730d4bb89dc3b242016c0d9030659ee4891df15?placeholderIfAbsent=true&apiKey=a7d7da211ad44a5aab803d9d255fbf27',
+    //     },
+    // ];
+    const renderTrack = ({ item, navigation }) => {
         return (
-            <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}}>
-                <Image source={{ uri: item.image }} style={styles.trackImage} resizeMode="contain" />
+            <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}}
+            onPress={() => {
+                navigation.navigate('MusicPlayer', { item, screen: 'ArtistProfile' });
+            }}
+            >
+                <Image source={{ uri: item.album.cover }} style={styles.trackImage} resizeMode="contain" />
                 <View style={styles.trackDetails}>
                     <Text style={styles.trackTitle}>{item.title}</Text>
-                    <Text style={styles.artistTrackName}>{item.artist}</Text>
+                    <Text style={styles.artistTrackName}>{item.artist.name}</Text>
                     <View style={styles.trackStats}>
                         <Image source={require ('../assets/Artist_Profile/Player-Play--Streamline-Tabler.png')} style={styles.playIcon} resizeMode="contain" />
-                        <Text style={styles.playCount}>{item.playCount}</Text>
+                        <Text style={styles.playCount}>{item.rank}</Text>
                         <Image source={require ('../assets/Artist_Profile/Vector.png')} style={styles.durationIcon} resizeMode="contain" />
                         <Text style={styles.duration}>{item.duration}</Text>
                     </View>
@@ -103,7 +108,7 @@ const ProfileHeader = () => {
     return (
       <View style={styles.popularTrack}>
         <View style={styles.trackInfo}>
-          <Text style={styles.sectionTitle}>Popolar</Text>
+          <Text style={styles.sectionTitle}>Popular</Text>
           {/* <Image
             source={{ uri: "https://cdn.builder.io/api/v1/image/assets/TEMP/fee5d29de9b1d8bdca1df866a730d4bb89dc3b242016c0d9030659ee4891df15?placeholderIfAbsent=true&apiKey=a7d7da211ad44a5aab803d9d255fbf27" }}
             style={styles.trackImage}
@@ -127,7 +132,10 @@ const ProfileHeader = () => {
               <Text style={styles.duration}>03:36</Text>
             </View>
           </View> */}
-          <FlatList data={track} renderItem={renderTrack} keyExtractor={item=>item.id}/>
+          <FlatList data={track} 
+            renderItem={({ item }) => renderTrack({ item, navigation })} 
+            keyExtractor={item=>item.id}
+          />
         </View>
         <Image
           source={{ uri: "https://cdn.builder.io/api/v1/image/assets/TEMP/18e69840fe81ce9d9a82989bae550dd8fd3a83d4faab7a753c03e6260ae709d5?placeholderIfAbsent=true&apiKey=a7d7da211ad44a5aab803d9d255fbf27" }}
@@ -239,21 +247,49 @@ const ProfileHeader = () => {
       </View>
     );
   };
-const ArtistProfile = () => {
+const ArtistProfile = ({navigation, route}) => {
     const dispatch = useDispatch();
     const player = useSelector((state) => state.player);
+    const musicManager = new MusicManager();
+    const { artist_id } = route.params;
+
+    const [tracks, setTracks] = useState([]);
+
+    useEffect(() => {
+        fetch('https://api.deezer.com/artist/' + artist_id + "/top?limit=10")
+            .then(response => response.json())
+            .then(data => {
+                setTracks(data.data);
+                dispatch(setAlbum(data.data));
+            })
+            .then(() => {
+                if (player.album.length > 0) {
+                    musicManager.album = player.album;
+                }
+            })
+            .catch(error => console.error('Error fetching data:', error));
+        
+        fetch('https://api.deezer.com/artist/' + artist_id)
+            .then(response => response.json())
+            .then(data => {
+                dispatch(setArtist(data));
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }, []);
 
     return (
-      <ScrollView style={styles.container}>
-        <ProfileHeader/>
-        <ActionButtons/>
-        <PopularTrack />
-        <AlbumSection />
-        <AboutSection />
-        <FansAlsoLike />
-        <View style={{height: 80}} />
-        {player.currentSong && <PlayMusicItem item={player.currentSong} screen={'ArtistProfile'} />}
+      <View style={styles.container}>
+        <ScrollView style={styles.container}>
+          <ProfileHeader item={player.artist} />
+          <ActionButtons />
+          <PopularTrack track={tracks} navigation={navigation} />
+          <AlbumSection />
+          <AboutSection />
+          <FansAlsoLike />
+          <View style={{height: 80}} />
         </ScrollView>
+        {player.currentSong && <PlayMusicItem item={player.currentSong} screen={'ArtistProfile'} />}
+      </View>
   );
 };
 
@@ -270,7 +306,7 @@ const styles = StyleSheet.create({
     profileImage: {
         width: 240,
         aspectRatio: 1,
-
+        borderRadius: 120,
       },
     artistName: {
         fontSize: 36,

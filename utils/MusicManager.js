@@ -8,6 +8,8 @@ class MusicManager {
             this.sound = null;
             this.dispatch = dispatch;
             this.isPlaying = false;
+            this.isRandom = false;
+            this.isRepeat = false;
             this.playlist = [];
             MusicManager.instance = this;
         }
@@ -43,21 +45,21 @@ class MusicManager {
         try {
             if (!uri) throw new Error('Audio URI is invalid or undefined.');
             await this.stopCurrentSound();
-    
+
             const { sound } = await Audio.Sound.createAsync({ uri });
             this.sound = sound;
             this.isPlaying = true;
-    
+
             await sound.playAsync();
             this.sound.setOnPlaybackStatusUpdate((status) => this.handlePlaybackStatus(status));
-    
+
             const status = await this.sound.getStatusAsync();
             if (status.isLoaded) {
                 const totalDuration = Math.floor(status.durationMillis / 1000);
                 this.dispatch(setDuration(totalDuration));
             }
         } catch (error) {
-            console.error('Error playing sound:', error);
+            console.error('Error playing sound:', error);       
             this.handleNextTrack(); // Automatically skip to the next track on error
         }
     }
@@ -75,18 +77,25 @@ class MusicManager {
             const current = Math.floor(status.positionMillis / 1000);
             this.dispatch(setCurrentDuration(current));
 
-            // Replay when finished
-            // if (status.didJustFinish && !status.isLooping) {
-            //     this.sound
-            //         .replayAsync()
-            //         .then(() => console.log('Replay successful'))
-            //         .catch((error) => console.error('Error replaying sound:', error));
-            // }
-
             // next track when finished
             if (status.didJustFinish) {
-                console.log('Song finished playing, moving to next track.');
-                this.handleNextTrack(); // Reset current duration
+                if (this.isRandom) {
+                    const randomIndex = Math.floor(Math.random() * this.playlist.length);
+                    this.currentSong = this.playlist[randomIndex];
+                    this.dispatch(setCurrentSong(this.currentSong));
+                    const randomUri = this.currentSong.preview;
+                    this.playSound(randomUri);
+                } else if (this.isRepeat) {
+                    this.dispatch(setCurrentDuration(0));
+                    this.playSound(this.currentSong.preview);
+                } else {
+                    if (this.playlist.length > 1)
+                        this.handleNextTrack();
+                    else {
+                        this.dispatch(setCurrentDuration(0));
+                        this.playSound(this.currentSong.preview);
+                    }
+                }
             }
         } else if (status.error) {
             console.error('Playback error:', status.error);
@@ -145,8 +154,8 @@ class MusicManager {
     // Get the previous track URI from the playlist
     getPreviousTrackUri() {
         const currentIndex = this.playlist.findIndex(song => song.id === this.currentSong.id);
-        const previousIndex = (currentIndex - 1 + this.playlist.length) % this.playlist.length;
-        return this.playlist[previousIndex].uri;
+        const previousIndex = (currentIndex - 1) % this.playlist.length;
+        return this.playlist[previousIndex].preview;
     }
 
     // Handle the next track button press
