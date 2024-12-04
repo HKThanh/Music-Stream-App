@@ -19,6 +19,20 @@ const formatDuration = (duration) => {
     return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
 }   
 
+const formatTotalDuration = (duration) => {
+    const hours = Math.floor(duration / 3600);
+    const minutes = Math.floor((duration % 3600) / 60);
+    const seconds = duration % 60;
+    return `${hours}:${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+}
+
+const shorterText = (text) => {
+    if (text.length > 15) {
+        return text.substring(0, 30) + '...';
+    }
+    return text;
+}
+
 const MusicItems = ({ item, navigation }) => (
     <TouchableOpacity style={{ padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
         onPress={() => navigation.navigate('MusicPlayer', { item, screen: 'PlayListDetail' })}
@@ -26,7 +40,7 @@ const MusicItems = ({ item, navigation }) => (
         <View style={{flexDirection: 'row'}}>
             <Image source={{uri: item.album.cover}} style={{ width: 60, height: 60 }} />
             <View style={{marginLeft: 20}}>
-                <Text style={{ fontSize: 16, fontWeight: '700' }}>{item.title}</Text>
+                <Text style={{ fontSize: 16, fontWeight: '700' }}>{shorterText(item.title)}</Text>
                 <Text style={{ fontSize: 14, color: '#000' }}>{item.artist.name}</Text>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     <Entypo name="triangle-right" size={16} color="#A8ACB4" />
@@ -111,12 +125,12 @@ const PlayListDetail = ({ navigation, route }) => {
                     <Image source={{uri: albums.cover}} style={{width: 120, height: 120, borderRadius: 14}} />
                 </View>
                 <View style={{marginLeft: 10, justifyContent: 'space-between', height: '100%'}}>
-                    <Text style={styles.playlistName}>{albums.title}</Text>
+                    <Text style={styles.playlistName}>{shorterText(albums.title)}</Text>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                         <FontAwesome6 name="heart" size={16} color="cyan" />
                         <Text style={[styles.normalText, {marginLeft: 10}]}>{albums.fans}</Text>
                         <Entypo name="dot-single" size={32} color="black" />
-                        <Text style={styles.normalText}>{formatDuration(albums.duration)}</Text>
+                        <Text style={styles.normalText}>{formatTotalDuration(albums.duration)}</Text>
                     </View>
                     <Text style={styles.normalText}>Daily chart-toppers update</Text>
                 </View>
