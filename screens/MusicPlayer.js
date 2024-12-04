@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Text, View, Image, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import { Text, View, Image, StyleSheet, TouchableOpacity, ImageBackground, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Audio } from 'expo-av';
 import CustomSlider from '../components/CustomSlider';
@@ -16,7 +16,7 @@ import {
 
 import MusicManager from '../utils/MusicManager';
 
-const MusicPlayer = ({navigation, route }) => {
+const MusicPlayer = ({ navigation, route }) => {
     const dispatch = useDispatch();
     const player = useSelector((state) => state.player);
     const musicManager = useRef(MusicManager.getInstance(dispatch)); // Singleton instance of MusicManager
@@ -88,24 +88,34 @@ const MusicPlayer = ({navigation, route }) => {
     };
 
     //return previous screen
-    const goBack = (screen, album_id) => {
+    const goBack = (screen, album_id, artist_id) => {
         if (screen === 'PlayListDetail') {
             navigation.navigate(screen, { id: album_id });
-        } else {
+        } else if (screen === 'ArtistProfile') {
+            navigation.navigate(screen, { id: artist_id });
+        }
+        else {
             navigation.navigate(screen);
         }
     }
 
     // Handle Next Track
     const handleNextTrack = async () => {
+        if (player.album.length < 2) {
+            Alert.alert('End of playlist', 'You have reached the end of the playlist.');
+            return;
+        }
+
         try {
             const nextUri = musicManager.current.getNextTrackUri();
             if (nextUri) {
                 const nextSong = player.album.find((song) => song.preview === nextUri);
-                musicManager.current.setPlaylist(player.album, nextSong);
+                musicManager.current.currentSong = nextSong;
                 await musicManager.current.playSound(nextUri);
                 dispatch(setCurrentSong(nextSong));
                 dispatch(setIsPlaying(true));
+            } else {
+                handleEndOfPlaylist();
             }
         } catch (error) {
             console.error('Error playing next track:', error);
@@ -114,17 +124,28 @@ const MusicPlayer = ({navigation, route }) => {
 
     // Handle Previous Track
     const handlePreviousTrack = async () => {
-        try {
-            const previousUri = musicManager.current.getPreviousTrackUri();
-            if (previousUri) {
-                const previousSong = player.album.find((song) => song.preview === previousUri);
-                musicManager.current.setPlaylist(player.album, previousSong);
-                await musicManager.current.playSound(previousUri);
-                dispatch(setCurrentSong(previousSong));
-                dispatch(setIsPlaying(true));
+        if (player.album.length < 2) {
+            Alert.alert('No previous track', 'You are already at the beginning of the playlist.');
+            return;
+        }
+
+        if (player.currentSong.id !== player.album[0].id) {
+            try {
+                const previousUri = musicManager.current.getPreviousTrackUri();
+                if (previousUri) {
+                    const previousSong = player.album.find((song) => song.preview === previousUri);
+                    musicManager.current.currentSong = previousSong;
+                    await musicManager.current.playSound(previousUri);
+                    dispatch(setCurrentSong(previousSong));
+                    dispatch(setIsPlaying(true));
+                } else {
+                    Alert.alert('No previous track', 'You are already at the beginning of the playlist.');
+                }
+            } catch (error) {
+                console.error('Error playing previous track:', error);
             }
-        } catch (error) {
-            console.error('Error playing previous track:', error);
+        } else {
+            Alert.alert('No previous track', 'You are already at the beginning of the playlist.');
         }
     };
 
@@ -134,7 +155,6 @@ const MusicPlayer = ({navigation, route }) => {
     }
 
     const repeatSong = (dispatch) => {
-        // Repeat the current song
         dispatch(setIsRepeat(!player.isRepeat));
         musicManager.current.isRepeat = !player.isRepeat;
     }
@@ -161,7 +181,7 @@ const MusicPlayer = ({navigation, route }) => {
                 <View style={styles.topBar}>
                     <Text style={styles.playText}>Play</Text>
                     <Icon name="chevron-down" size={24} color="white" 
-                        onPress={() => goBack(screen, player.currentSong.album.id)}
+                        onPress={() => goBack(screen, player.currentSong.album.id, player.artist.id)}
                     />
                 </View>
 

@@ -88,10 +88,13 @@ class MusicManager {
                 } else if (this.isRepeat) {
                     this.dispatch(setCurrentDuration(0));
                     this.playSound(this.currentSong.preview);
-                }
-                
-                else {
-                    this.handleNextTrack();
+                } else {
+                    if (this.playlist.length > 1)
+                        this.handleNextTrack();
+                    else {
+                        this.dispatch(setCurrentDuration(0));
+                        this.playSound(this.currentSong.preview);
+                    }
                 }
             }
         } else if (status.error) {
@@ -151,8 +154,8 @@ class MusicManager {
     // Get the previous track URI from the playlist
     getPreviousTrackUri() {
         const currentIndex = this.playlist.findIndex(song => song.id === this.currentSong.id);
-        const previousIndex = (currentIndex - 1 + this.playlist.length) % this.playlist.length;
-        return this.playlist[previousIndex].uri;
+        const previousIndex = (currentIndex - 1) % this.playlist.length;
+        return this.playlist[previousIndex].preview;
     }
 
     // Handle the next track button press

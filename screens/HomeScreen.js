@@ -9,6 +9,7 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     Dimensions,
     FlatList,
     KeyboardAvoidingView,
@@ -22,6 +23,7 @@ const { width } = Dimensions.get("window");
 
 const api = 'https://api.deezer.com/chart/0/albums?limit=3&order=RATING_DESC';
 const api_chart = 'https://api.deezer.com/chart/0/playlists?limit=3&order=RATING_DESC';
+const api_artist = 'https://api.deezer.com/chart/0/artists?limit=3&order=RATING_DESC';
 
 const shortTheText = (text, maxLength) => {
     if (text.length <= maxLength) {
@@ -45,7 +47,7 @@ const renderSuggestionItem = ({ item }) => {
 const ChartItem = ({ item, navigation }) => {
     return (
         <TouchableOpacity style={styles.chartItem} activeOpacity={0.7}
-            onPress={() => navigation.navigate("PlayListDetail")}
+            onPress={() => navigation.navigate("PlayListDetail", { id: item.id, type: 'chart' })}
         >
             <Image
                 resizeMode="contain"
@@ -61,7 +63,7 @@ const AlbumItem = ({ item, navigation }) => {
     return (
         <TouchableOpacity
             style={styles.albumItem}
-            onPress={() => navigation.navigate("PlayListDetail", { id: item.id })}
+            onPress={() => navigation.navigate("PlayListDetail", { id: item.id, type: 'album' })}
         >
             <Image
                 source={{uri : item.cover}}
@@ -75,23 +77,27 @@ const AlbumItem = ({ item, navigation }) => {
     );
 }
 
-const ArtistItem = ({ item }) => {
+const ArtistItem = ({ item, navigation }) => {
     return (
-        <View style={styles.artistItem}>
-            <Image
-                source={item.imageSource}
-                style={styles.artistImage}
-                resizeMode="contain"
-                accessibilityLabel={item.name}
-            />
-            <Text style={styles.artistName}>{item.name}</Text>
-            <TouchableOpacity
-                style={styles.followButton}
-                accessibilityLabel={`Follow ${item.name}`}
-            >
-                <Text style={styles.followButtonText}>Follow</Text>
-            </TouchableOpacity>
-        </View>
+        <TouchableWithoutFeedback
+            onPress={() => navigation.navigate("ArtistProfile", { artist_id: item.id })}
+        >
+            <View style={styles.artistItem}>
+                <Image
+                    source={{uri: item.picture_small}}
+                    style={styles.artistImage}
+                    resizeMode="contain"
+                    accessibilityLabel={item.name}
+                />
+                <Text style={styles.artistName}>{item.name}</Text>
+                <TouchableOpacity
+                    style={styles.followButton}
+                    accessibilityLabel={`Follow ${item.name}`}
+                >
+                    <Text style={styles.followButtonText}>Follow</Text>
+                </TouchableOpacity>
+            </View>
+        </TouchableWithoutFeedback>
     );
 };
 
@@ -99,6 +105,7 @@ const HomeScreen = ({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [albums, setAlbums] = useState([]);
     const [charts, setCharts] = useState([]);
+    const [artists, setArtists] = useState([]);
 
     const dispatch = useDispatch();
     const player = useSelector((state) => state.player);
@@ -112,6 +119,11 @@ const HomeScreen = ({ navigation }) => {
         fetch(api_chart)
             .then((response) => response.json())
             .then((data) => setCharts(data.data))
+            .catch((error) => console.error(error));
+
+        fetch(api_artist)
+            .then((response) => response.json())
+            .then((data) => setArtists(data.data))
             .catch((error) => console.error(error));
     }, []);
 
@@ -248,24 +260,8 @@ const HomeScreen = ({ navigation }) => {
                         </View>
                         <FlatList
                             horizontal
-                            data={[
-                                {
-                                    id: 1,
-                                    imageSource: require("../assets/Home_Audio_Listing/Image_39.png"),
-                                    name: "Jenifer Wilson",
-                                },
-                                {
-                                    id: 2,
-                                    imageSource: require("../assets/Home_Audio_Listing/Image_40.png"),
-                                    name: "Elizabeth Hall",
-                                },
-                                {
-                                    id: 3,
-                                    imageSource: require("../assets/Home_Audio_Listing/Image_41.png"),
-                                    name: "Anthony",
-                                },
-                            ]}
-                            renderItem={({ item }) => <ArtistItem item={item} />}
+                            data={artists}
+                            renderItem={({ item }) => <ArtistItem item={item} navigation={navigation} />}
                             keyExtractor={(item) => item.id.toString()}
                             showsHorizontalScrollIndicator={false}
                         />
@@ -404,10 +400,10 @@ const styles = StyleSheet.create({
         marginRight: 20,
     },
     artistImage: {
-        width: "100%",
-        height: width * 0.3,
+        width: 110,
+        height: 110,
         marginBottom: 10,
-        borderRadius: (width * 0.3) / 2,
+        borderRadius: 110 / 2,
     },
     artistName: {
         fontSize: 13,

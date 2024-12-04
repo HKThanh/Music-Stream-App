@@ -41,9 +41,27 @@ const MusicItems = ({ item, navigation }) => (
 )
 
 const PlayListDetail = ({ navigation, route }) => {
-    const { id } = route.params;
+    const { id, type } = route.params;
+    let api = 'https://api.deezer.com/';
 
-    const api = 'https://api.deezer.com/album/' + id;
+    switch (type) {
+        case 'playlist':
+            api += 'playlist/' + id;
+            break;
+        case 'album':
+            api += 'album/' + id;
+            break;
+        case 'artist':
+            api += 'artist/' + id;
+            break;
+        case 'chart':
+            api += 'playlist/' + id;
+            break;
+        default:
+            break;
+    }
+
+    // const api = 'https://api.deezer.com/album/' + id;
     const player = useSelector(state => state.player);
 
     const musicManager = new MusicManager();
@@ -56,8 +74,13 @@ const PlayListDetail = ({ navigation, route }) => {
         fetch(api)
             .then(response => response.json())
             .then(data => { 
-                dispatch(setAlbum(data.tracks.data)) 
+                dispatch(setAlbum(data.tracks.data));
                 setAlbums(data);
+            })
+            .then(() => {
+                if (player.album.length > 0) {
+                    musicManager.current.playlist = player.album;
+                }
             })
             .catch(error => console.error('Error fetching data:', error));
     }, []);
