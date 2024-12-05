@@ -125,7 +125,7 @@ const PlayListDetail = ({ navigation, route }) => {
                     <Image source={{uri: albums.cover}} style={{width: 120, height: 120, borderRadius: 14}} />
                 </View>
                 <View style={{marginLeft: 10, justifyContent: 'space-between', height: '100%'}}>
-                    <Text style={styles.playlistName}>{shorterText(albums.title)}</Text>
+                    <Text style={styles.playlistName}>{albums.title}</Text>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                         <FontAwesome6 name="heart" size={16} color="cyan" />
                         <Text style={[styles.normalText, {marginLeft: 10}]}>{albums.fans}</Text>
